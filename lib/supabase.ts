@@ -1,0 +1,29 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  '';
+
+const createSupabaseClient = () => {
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
+};
+
+declare global {
+  var __supabase: undefined | ReturnType<typeof createSupabaseClient>;
+}
+
+const supabase = globalThis.__supabase ?? createSupabaseClient();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.__supabase = supabase;
+}
+
+export { supabase };

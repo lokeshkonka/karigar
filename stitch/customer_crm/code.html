@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MYGARAGE | CUSTOMER CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#F5F0E8",
+              "surface-container-highest": "#e5e2e1",
+              "secondary": "#ae2f34",
+              "outline": "#7d775f",
+              "on-tertiary-container": "#0b69aa",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#dec800",
+              "error-container": "#ffdad6",
+              "secondary-container": "#ff6b6b",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#d3e6ff",
+              "inverse-surface": "#313030",
+              "primary-fixed": "#fee400",
+              "on-secondary-fixed-variant": "#8c1520",
+              "on-error-container": "#93000a",
+              "primary-fixed-dim": "#dec800",
+              "surface-container-low": "#f6f3f2",
+              "surface": "#1a1a1a",
+              "surface-tint": "#6a5f00",
+              "on-tertiary-fixed": "#001d35",
+              "primary-container": "#FFE500",
+              "on-tertiary-fixed-variant": "#00497a",
+              "primary": "#6a5f00",
+              "on-secondary-container": "#6d0010",
+              "surface-container": "#f0eded",
+              "secondary-fixed": "#ffdad8",
+              "tertiary-fixed": "#d0e4ff",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1c1b1b",
+              "surface-variant": "#e5e2e1",
+              "on-secondary-fixed": "#410006",
+              "error": "#ba1a1a",
+              "on-error": "#ffffff",
+              "on-surface-variant": "#4b4731",
+              "outline-variant": "#cec7aa",
+              "on-surface": "#1c1b1b",
+              "tertiary-fixed-dim": "#9ccaff",
+              "surface-dim": "#dcd9d9",
+              "surface-container-high": "#eae7e7",
+              "surface-bright": "#fcf9f8",
+              "on-primary-fixed": "#201c00",
+              "on-primary-fixed-variant": "#504700",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#726600",
+              "inverse-on-surface": "#f3f0ef",
+              "tertiary": "#0062a0",
+              "secondary-fixed-dim": "#ffb3b0"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Mono"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neubrutalist-shadow {
+            box-shadow: 4px 4px 0px 0px #1a1a1a;
+        }
+        .neubrutalist-shadow-sm {
+            box-shadow: 2px 2px 0px 0px #1a1a1a;
+        }
+        .active-click:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #1a1a1a;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#1a1a1a] flex flex-col z-40 border-r-[3px] border-black shadow-[4px_0_0_0_#1a1a1a]">
+<div class="p-6">
+<h1 class="font-headline font-black italic text-[#FFE500] text-2xl tracking-tighter">MYGARAGE</h1>
+<p class="font-headline font-bold uppercase tracking-wider text-xs text-stone-500 mt-1">High-Octane Ops</p>
+</div>
+<nav class="flex-1 mt-4">
+<ul class="space-y-0">
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+                        Work Orders
+                    </a>
+</li>
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+                        Vehicles
+                    </a>
+</li>
+<li>
+<a class="text-[#1a1a1a] bg-[#FFE500] border-y-[3px] border-black px-6 py-4 flex items-center gap-4 transition-all font-headline font-black uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+                        Customers
+                    </a>
+</li>
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="handyman">handyman</span>
+                        Inventory
+                    </a>
+</li>
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+                        Billing
+                    </a>
+</li>
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+                        Calendar
+                    </a>
+</li>
+<li>
+<a class="text-stone-400 hover:text-[#FFE500] hover:bg-stone-800 px-6 py-4 flex items-center gap-4 transition-all font-headline font-bold uppercase tracking-wider text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                        Analytics
+                    </a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto p-6 space-y-4 border-t-[3px] border-black">
+<button class="w-full bg-[#FFE500] border-[3px] border-black font-headline font-black uppercase py-3 active-click neubrutalist-shadow-sm text-sm">
+                New Work Order
+            </button>
+<div class="flex flex-col gap-2">
+<a class="text-stone-400 flex items-center gap-3 text-xs font-headline font-bold uppercase tracking-widest hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span> Settings
+                </a>
+<a class="text-stone-400 flex items-center gap-3 text-xs font-headline font-bold uppercase tracking-widest hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span> Logout
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 p-8">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full mb-12">
+<div class="flex items-center gap-4">
+<h2 class="font-headline font-black text-4xl uppercase tracking-tighter text-[#1a1a1a]">Customer CRM</h2>
+<div class="h-1 w-24 bg-[#FFE500] border-y-[1px] border-black mt-2"></div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-[#1a1a1a]">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</span>
+<input class="pl-12 pr-4 py-3 bg-white border-[3px] border-black font-headline font-bold placeholder:text-stone-400 focus:outline-none focus:bg-[#FFE500] w-80 transition-all neubrutalist-shadow-sm" placeholder="FIND A CUSTOMER..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-3 border-[3px] border-black bg-white active-click neubrutalist-shadow-sm">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-3 border-[3px] border-black bg-white active-click neubrutalist-shadow-sm">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+<div class="ml-4 flex items-center gap-3 border-[3px] border-black bg-white px-3 py-1 neubrutalist-shadow-sm">
+<div class="w-8 h-8 bg-[#FFE500] border-[2px] border-black overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="Headshot of a professional service manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwD2rcRVRFdXyX8lASaTUr19A2NwXME53qBoBPNPX24Bz8MxihFR6Ajq-E7yocqhqG2BGxLMyCSkJbCfV36VFXcfyftAvFZ0RM0U7kqR1RWHIov2Yqgess4Z3Qtgw0fcd38urA1cG9QJZUJZEGdQNFc7e01kMDr5ZssJ0DNQEQKEB6qfkIXu5DObUur6aaSu768AUDf8kGC6W6YR3zNhbywqR4k2CxLuh_hmAyJq2CC5fTGNUJesz_BdH_UitPz_GjPFwfxQ8SQQ"/>
+</div>
+<span class="font-headline font-black uppercase text-sm">Admin</span>
+</div>
+</div>
+</header>
+<!-- Metrics Bar -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="bg-white border-[3px] border-black p-6 neubrutalist-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -top-2 text-6xl font-headline font-black text-[#FFE500]/20 rotate-12 group-hover:rotate-0 transition-transform">01</div>
+<p class="font-headline font-bold uppercase text-stone-500 tracking-widest text-xs mb-2">Total Customers</p>
+<h3 class="font-headline font-black text-4xl">1,284</h3>
+<div class="mt-4 flex items-center gap-2 text-xs font-label font-bold text-green-600">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                    +12% THIS MONTH
+                </div>
+</div>
+<div class="bg-[#FFE500] border-[3px] border-black p-6 neubrutalist-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -top-2 text-6xl font-headline font-black text-[#1a1a1a]/10 rotate-12 group-hover:rotate-0 transition-transform">02</div>
+<p class="font-headline font-bold uppercase text-[#1a1a1a] tracking-widest text-xs mb-2">Active Service</p>
+<h3 class="font-headline font-black text-4xl text-[#1a1a1a]">42</h3>
+<div class="mt-4 flex items-center gap-2 text-xs font-label font-bold text-[#1a1a1a]">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                    ON WORKBENCH
+                </div>
+</div>
+<div class="bg-white border-[3px] border-black p-6 neubrutalist-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -top-2 text-6xl font-headline font-black text-[#FFE500]/20 rotate-12 group-hover:rotate-0 transition-transform">03</div>
+<p class="font-headline font-bold uppercase text-stone-500 tracking-widest text-xs mb-2">Loyalty Points</p>
+<h3 class="font-headline font-black text-4xl">45.2K</h3>
+<div class="mt-4 flex items-center gap-2 text-xs font-label font-bold text-tertiary">
+<span class="material-symbols-outlined text-sm" data-icon="stars">stars</span>
+                    ACROSS FLEET
+                </div>
+</div>
+<div class="bg-[#ff6b6b] border-[3px] border-black p-6 neubrutalist-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -top-2 text-6xl font-headline font-black text-white/20 rotate-12 group-hover:rotate-0 transition-transform">04</div>
+<p class="font-headline font-bold uppercase text-white tracking-widest text-xs mb-2">New This Month</p>
+<h3 class="font-headline font-black text-4xl text-white">88</h3>
+<div class="mt-4 flex items-center gap-2 text-xs font-label font-bold text-white">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+                    RECORD PACE
+                </div>
+</div>
+</section>
+<!-- Customer Table Container -->
+<section class="bg-white border-[3px] border-black neubrutalist-shadow overflow-hidden">
+<div class="p-6 border-b-[3px] border-black flex justify-between items-center bg-surface-container-low">
+<div class="flex gap-4">
+<button class="bg-[#1a1a1a] text-[#FFE500] px-6 py-2 border-[3px] border-black font-headline font-black uppercase text-xs active-click neubrutalist-shadow-sm">
+                        All Customers
+                    </button>
+<button class="bg-white text-[#1a1a1a] px-6 py-2 border-[3px] border-black font-headline font-black uppercase text-xs active-click neubrutalist-shadow-sm">
+                        High Value
+                    </button>
+<button class="bg-white text-[#1a1a1a] px-6 py-2 border-[3px] border-black font-headline font-black uppercase text-xs active-click neubrutalist-shadow-sm">
+                        Inactive
+                    </button>
+</div>
+<button class="flex items-center gap-2 font-headline font-black uppercase text-xs border-[3px] border-black px-4 py-2 bg-white active-click neubrutalist-shadow-sm">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                    Filter
+                </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#1a1a1a] text-white">
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs border-r border-stone-700">Name</th>
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs border-r border-stone-700">Phone</th>
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs border-r border-stone-700">Vehicles</th>
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs border-r border-stone-700">Total Spent (LTV)</th>
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs border-r border-stone-700">Last Visit</th>
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs border-r border-stone-700 text-center">Loyalty Tier</th>
+<th class="px-6 py-4 font-headline font-black uppercase tracking-widest text-xs text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y-[3px] divide-black">
+<!-- Row 1 -->
+<tr class="hover:bg-primary-container/20 transition-colors">
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-stone-200 border-[2px] border-black flex items-center justify-center font-headline font-black text-lg">AJ</div>
+<div>
+<div class="font-headline font-black uppercase text-sm">Alex Johnson</div>
+<div class="font-label text-[10px] text-stone-500">ID: #MG-9832</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-label font-bold text-sm border-r-[3px] border-black">(555) 123-4567</td>
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex flex-wrap gap-1">
+<span class="bg-[#1a1a1a] text-[#FFE500] px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter">F-150</span>
+<span class="bg-stone-200 text-[#1a1a1a] px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter border border-black">911 GT3</span>
+</div>
+</td>
+<td class="px-6 py-5 font-headline font-black text-sm border-r-[3px] border-black">$12,450.00</td>
+<td class="px-6 py-5 font-label text-xs border-r-[3px] border-black">Oct 12, 2023</td>
+<td class="px-6 py-5 border-r-[3px] border-black text-center">
+<span class="bg-[#FFE500] border-[2px] border-black px-3 py-1 text-[10px] font-black uppercase tracking-widest neubrutalist-shadow-sm">Gold</span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="flex justify-center gap-2">
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#74B9FF] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="sms">sms</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#ff6b6b] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-[#1a1a1a] text-white hover:bg-black active-click">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary-container/20 transition-colors">
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-stone-200 border-[2px] border-black flex items-center justify-center font-headline font-black text-lg">MR</div>
+<div>
+<div class="font-headline font-black uppercase text-sm">Maria Rodriguez</div>
+<div class="font-label text-[10px] text-stone-500">ID: #MG-8812</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-label font-bold text-sm border-r-[3px] border-black">(555) 987-6543</td>
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex flex-wrap gap-1">
+<span class="bg-[#1a1a1a] text-[#FFE500] px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter">Model S</span>
+</div>
+</td>
+<td class="px-6 py-5 font-headline font-black text-sm border-r-[3px] border-black">$4,210.50</td>
+<td class="px-6 py-5 font-label text-xs border-r-[3px] border-black">Nov 02, 2023</td>
+<td class="px-6 py-5 border-r-[3px] border-black text-center">
+<span class="bg-stone-300 border-[2px] border-black px-3 py-1 text-[10px] font-black uppercase tracking-widest neubrutalist-shadow-sm">Silver</span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="flex justify-center gap-2">
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#74B9FF] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="sms">sms</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#ff6b6b] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-[#1a1a1a] text-white hover:bg-black active-click">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary-container/20 transition-colors">
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-stone-200 border-[2px] border-black flex items-center justify-center font-headline font-black text-lg">BW</div>
+<div>
+<div class="font-headline font-black uppercase text-sm">Bill Watkins</div>
+<div class="font-label text-[10px] text-stone-500">ID: #MG-7721</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-label font-bold text-sm border-r-[3px] border-black">(555) 444-2211</td>
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex flex-wrap gap-1">
+<span class="bg-[#1a1a1a] text-[#FFE500] px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter">Civic</span>
+<span class="bg-[#1a1a1a] text-[#FFE500] px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter">CR-V</span>
+</div>
+</td>
+<td class="px-6 py-5 font-headline font-black text-sm border-r-[3px] border-black">$1,120.00</td>
+<td class="px-6 py-5 font-label text-xs border-r-[3px] border-black">Sep 30, 2023</td>
+<td class="px-6 py-5 border-r-[3px] border-black text-center">
+<span class="bg-orange-400 border-[2px] border-black px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white neubrutalist-shadow-sm">Bronze</span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="flex justify-center gap-2">
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#74B9FF] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="sms">sms</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#ff6b6b] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-[#1a1a1a] text-white hover:bg-black active-click">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-primary-container/20 transition-colors">
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-stone-200 border-[2px] border-black flex items-center justify-center font-headline font-black text-lg">KC</div>
+<div>
+<div class="font-headline font-black uppercase text-sm">Kevin Chen</div>
+<div class="font-label text-[10px] text-stone-500">ID: #MG-6542</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-label font-bold text-sm border-r-[3px] border-black">(555) 234-9081</td>
+<td class="px-6 py-5 border-r-[3px] border-black">
+<div class="flex flex-wrap gap-1">
+<span class="bg-[#1a1a1a] text-[#FFE500] px-2 py-0.5 text-[10px] font-black uppercase tracking-tighter">Corvette Z06</span>
+</div>
+</td>
+<td class="px-6 py-5 font-headline font-black text-sm border-r-[3px] border-black">$28,900.00</td>
+<td class="px-6 py-5 font-label text-xs border-r-[3px] border-black">Nov 15, 2023</td>
+<td class="px-6 py-5 border-r-[3px] border-black text-center">
+<span class="bg-[#FFE500] border-[2px] border-black px-3 py-1 text-[10px] font-black uppercase tracking-widest neubrutalist-shadow-sm">Gold</span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="flex justify-center gap-2">
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#74B9FF] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="sms">sms</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-white hover:bg-[#ff6b6b] transition-colors active-click">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+</button>
+<button class="p-2 border-[2px] border-black bg-[#1a1a1a] text-white hover:bg-black active-click">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t-[3px] border-black flex justify-between items-center bg-surface-container-low">
+<span class="font-label text-xs text-stone-600">SHOWING 1-4 OF 1,284 CUSTOMERS</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 border-[3px] border-black bg-white flex items-center justify-center active-click neubrutalist-shadow-sm">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 border-[3px] border-black bg-[#FFE500] flex items-center justify-center font-headline font-black active-click neubrutalist-shadow-sm">1</button>
+<button class="w-10 h-10 border-[3px] border-black bg-white flex items-center justify-center font-headline font-black active-click neubrutalist-shadow-sm">2</button>
+<button class="w-10 h-10 border-[3px] border-black bg-white flex items-center justify-center font-headline font-black active-click neubrutalist-shadow-sm">3</button>
+<button class="w-10 h-10 border-[3px] border-black bg-white flex items-center justify-center active-click neubrutalist-shadow-sm">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Asymmetric Promotion Area -->
+<section class="mt-12 flex gap-8">
+<div class="flex-1 bg-tertiary-container border-[3px] border-black p-8 neubrutalist-shadow relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="font-headline font-black text-2xl uppercase tracking-tighter mb-4">Launch Holiday SMS Campaign</h4>
+<p class="font-body text-sm text-on-surface mb-6 max-w-md">Target your Gold and Silver tier customers with a holiday special. Automate your outreach and fill your January calendar.</p>
+<button class="bg-[#1a1a1a] text-white px-8 py-3 border-[3px] border-black font-headline font-black uppercase text-sm neubrutalist-shadow active-click">
+                        Generate Campaign
+                    </button>
+</div>
+<div class="absolute right-0 bottom-0 opacity-10">
+<span class="material-symbols-outlined text-[120px]" data-icon="campaign">campaign</span>
+</div>
+</div>
+<div class="w-1/3 bg-[#FFE500] border-[3px] border-black p-8 neubrutalist-shadow flex flex-col justify-center items-center text-center">
+<span class="material-symbols-outlined text-4xl mb-4" data-icon="add_reaction">add_reaction</span>
+<h4 class="font-headline font-black text-xl uppercase tracking-tighter mb-2">Grow Loyalty</h4>
+<p class="font-body text-xs mb-4">Current loyalty adoption is at 74%. Send invite to 320 remaining users.</p>
+<button class="w-full bg-white border-[3px] border-black py-2 font-headline font-black uppercase text-xs neubrutalist-shadow-sm active-click">
+                    Invite All
+                </button>
+</div>
+</section>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-8 right-8 bg-[#FFE500] w-16 h-16 border-[3px] border-black neubrutalist-shadow flex items-center justify-center group active-click z-50">
+<span class="material-symbols-outlined text-3xl transition-transform group-hover:rotate-90" data-icon="person_add">person_add</span>
+</button>
+</body></html>

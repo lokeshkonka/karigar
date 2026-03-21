@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#6d0010",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#eae7e7",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#001d35",
+                        "surface-container-highest": "#e5e2e1",
+                        "tertiary-fixed": "#d0e4ff",
+                        "primary-container": "#ffe500",
+                        "surface-container": "#f0eded",
+                        "on-primary-fixed-variant": "#504700",
+                        "inverse-surface": "#313030",
+                        "on-secondary-fixed-variant": "#8c1520",
+                        "surface-container-low": "#f6f3f2",
+                        "tertiary": "#0062a0",
+                        "on-primary-fixed": "#201c00",
+                        "inverse-primary": "#dec800",
+                        "primary-fixed-dim": "#dec800",
+                        "background": "#F5F0E8",
+                        "tertiary-container": "#d3e6ff",
+                        "surface-tint": "#6a5f00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f3f0ef",
+                        "primary-fixed": "#fee400",
+                        "secondary-fixed": "#ffdad8",
+                        "on-primary-container": "#726600",
+                        "surface-dim": "#dcd9d9",
+                        "surface-variant": "#e5e2e1",
+                        "on-surface-variant": "#4b4731",
+                        "secondary-fixed-dim": "#ffb3b0",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1c1b1b",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cec7aa",
+                        "outline": "#7d775f",
+                        "tertiary-fixed-dim": "#9ccaff",
+                        "on-tertiary-container": "#0b69aa",
+                        "on-secondary-fixed": "#410006",
+                        "on-tertiary-fixed-variant": "#00497a",
+                        "surface": "#fcf9f8",
+                        "secondary": "#ae2f34",
+                        "primary": "#6a5f00",
+                        "secondary-container": "#ff6b6b",
+                        "error": "#ba1a1a"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Mono"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neubrutal-shadow {
+            box-shadow: 4px 4px 0px 0px #1a1a1a;
+        }
+        .neubrutal-shadow-sm {
+            box-shadow: 2px 2px 0px 0px #1a1a1a;
+        }
+        .neubrutal-active:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #1a1a1a;
+        }
+    </style>
+</head>
+<body class="bg-[#F5F0E8] font-body text-[#1a1a1a] selection:bg-primary-container">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-[#1a1a1a] dark:bg-black h-screen w-64 border-r-4 border-[#1a1a1a] shadow-[4px_0_0_0_#1a1a1a]">
+<div class="mb-8 p-2">
+<h1 class="text-xl font-black text-[#FFE500] italic font-headline uppercase tracking-wider">MYGARAGE</h1>
+<p class="text-[10px] font-bold text-[#FFE500] opacity-80 font-headline tracking-widest">HEAVY DUTY MGMT</p>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all text-white hover:text-[#FFE500] mb-2" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all text-white hover:text-[#FFE500] mb-2" href="#">
+<span class="material-symbols-outlined">build</span> Work Orders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] shadow-[4px_4px_0_0_#000] mb-2" href="#">
+<span class="material-symbols-outlined">directions_car</span> Vehicles
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all text-white hover:text-[#FFE500] mb-2" href="#">
+<span class="material-symbols-outlined">groups</span> CRM
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all text-white hover:text-[#FFE500] mb-2" href="#">
+<span class="material-symbols-outlined">inventory_2</span> Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all text-white hover:text-[#FFE500] mb-2" href="#">
+<span class="material-symbols-outlined">receipt_long</span> Billing
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-headline text-sm uppercase tracking-wider transition-all text-white hover:text-[#FFE500] mb-2" href="#">
+<span class="material-symbols-outlined">analytics</span> Analytics
+            </a>
+</div>
+<button class="mt-auto bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] py-3 px-4 font-headline font-black text-xs tracking-tighter neubrutal-shadow neubrutal-active uppercase">
+            NEW WORK ORDER
+        </button>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-30 flex justify-between items-center w-full px-8 py-4 bg-[#F5F0E8] border-b-4 border-[#1a1a1a]">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-black text-[#1a1a1a] tracking-tighter font-headline uppercase">Vehicle Profile / <span class="text-[#6a5f00]">911-GT3</span></h2>
+</div>
+<div class="flex items-center gap-6">
+<button class="bg-[#FFE500] border-2 border-[#1a1a1a] px-6 py-2 font-headline font-black text-sm tracking-widest uppercase neubrutal-shadow neubrutal-active">
+                    VIEW IN GARAGE
+                </button>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-2xl cursor-pointer hover:bg-primary-container p-1 transition-colors">notifications</span>
+<span class="material-symbols-outlined text-2xl cursor-pointer hover:bg-primary-container p-1 transition-colors">settings</span>
+</div>
+</div>
+</header>
+<div class="p-8 space-y-8 max-w-[1400px] mx-auto">
+<!-- Bento Layout Header Section -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Vehicle Identity Card -->
+<div class="col-span-12 lg:col-span-4 bg-white border-[3px] border-[#1a1a1a] neubrutal-shadow p-6 flex flex-col justify-between relative overflow-hidden">
+<div class="absolute -right-4 -top-4 text-8xl font-black text-[#f0eded] font-headline select-none z-0">911</div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-secondary-container text-white px-2 py-0.5 text-[10px] font-bold uppercase border border-black">Priority Unit</span>
+<span class="bg-tertiary-container text-on-tertiary-container px-2 py-0.5 text-[10px] font-bold uppercase border border-black">Active Service</span>
+</div>
+<h3 class="text-4xl font-black font-headline uppercase leading-none mb-1">Porsche 911</h3>
+<p class="text-xl font-bold font-headline text-outline mb-6">GT3 RS • 2022</p>
+<div class="space-y-4">
+<div class="flex justify-between border-b-2 border-dashed border-[#1a1a1a] pb-2">
+<span class="font-headline font-bold text-xs uppercase opacity-60">Engine / Fuel</span>
+<span class="font-label font-bold text-sm">4.0L FLAT-6 / PETROL</span>
+</div>
+<div class="flex justify-between border-b-2 border-dashed border-[#1a1a1a] pb-2">
+<span class="font-headline font-bold text-xs uppercase opacity-60">VIN Number</span>
+<span class="font-label font-bold text-sm">WP0ZZZ99ZNS2*****</span>
+</div>
+<div class="flex justify-between border-b-2 border-dashed border-[#1a1a1a] pb-2">
+<span class="font-headline font-bold text-xs uppercase opacity-60">Registration</span>
+<span class="font-label font-bold text-sm">GT3-2022-GER</span>
+</div>
+<div class="flex justify-between border-b-2 border-dashed border-[#1a1a1a] pb-2">
+<span class="font-headline font-bold text-xs uppercase opacity-60">Odometer</span>
+<span class="font-label font-bold text-sm">12,450 KM</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t-4 border-[#1a1a1a] flex items-center gap-4 relative z-10">
+<div class="w-12 h-12 bg-primary-container border-2 border-black flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">person</span>
+</div>
+<div>
+<p class="text-[10px] font-bold font-headline uppercase opacity-60 leading-none">Registered Owner</p>
+<p class="text-lg font-black font-headline uppercase">Marcus Vallenberg</p>
+</div>
+</div>
+</div>
+<!-- 3D Interactive Viewer Simulation -->
+<div class="col-span-12 lg:col-span-8 bg-white border-[3px] border-[#1a1a1a] neubrutal-shadow relative min-h-[500px] group overflow-hidden">
+<!-- 3D Simulation Background -->
+<div class="absolute inset-0 bg-[#f0eded] opacity-50" style="background-image: radial-gradient(#1a1a1a 1px, transparent 1px); background-size: 20px 20px;"></div>
+<div class="absolute inset-0 flex items-center justify-center p-12">
+<img alt="Porsche 911 GT3" class="w-full h-full object-contain filter grayscale contrast-125 mix-blend-multiply" data-alt="Silver Porsche 911 GT3 from side profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLxChLs6sFqpn9oc-PyK6fnpUYGZx85xSYfYEd_PV74ImR_Un2v0USuX3IUuTZQW5YILkyWyHWj0i536ZvXkiWJDBYI22Kz11KiLW6eMsnYyJHrRjivO_OOgikzbPNq7zVeOgCDaMFNDXnV0fIqI93FSpBBjerk7LMvyBbXHX7ppafQ2TI02eeDjNxRCjl4R1ThKRu4BUSgGpYa5QH2KJ95ZHcwgHoYqz7Ymdc6B4my52haatkaTm0isE300KGA2ci8206Ecd1Wg"/>
+<!-- Damage Markers (Interactive Pins) -->
+<div class="absolute top-[45%] left-[30%] group/pin">
+<div class="w-4 h-4 bg-[#ff6b6b] border-2 border-black animate-pulse cursor-pointer"></div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-black text-white p-2 text-xs font-label opacity-0 group-hover/pin:opacity-100 transition-opacity pointer-events-none border border-white">
+<span class="text-secondary-container font-black">DMG-041:</span> Minor scratch on left fender. Repair scheduled.
+                            </div>
+</div>
+<div class="absolute top-[60%] left-[75%] group/pin">
+<div class="w-4 h-4 bg-[#ff6b6b] border-2 border-black animate-pulse cursor-pointer"></div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-black text-white p-2 text-xs font-label opacity-0 group-hover/pin:opacity-100 transition-opacity pointer-events-none border border-white">
+<span class="text-secondary-container font-black">DMG-089:</span> Rear alloy curb rash. Refurbishment needed.
+                            </div>
+</div>
+</div>
+<!-- Viewer Controls -->
+<div class="absolute bottom-6 left-6 flex gap-2">
+<button class="bg-white border-2 border-black p-2 hover:bg-primary-container transition-colors neubrutal-shadow-sm neubrutal-active">
+<span class="material-symbols-outlined">rotate_right</span>
+</button>
+<button class="bg-white border-2 border-black p-2 hover:bg-primary-container transition-colors neubrutal-shadow-sm neubrutal-active">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="bg-white border-2 border-black p-2 hover:bg-primary-container transition-colors neubrutal-shadow-sm neubrutal-active">
+<span class="material-symbols-outlined">3d_rotation</span>
+</button>
+</div>
+<div class="absolute top-6 right-6 text-right">
+<p class="font-headline font-black text-2xl uppercase italic text-[#1a1a1a]">Digital Twin v2.4</p>
+<p class="font-label text-[10px] font-bold">SCAN DATE: 12.04.2024</p>
+</div>
+</div>
+</div>
+<!-- Service History Timeline -->
+<div class="space-y-6">
+<div class="flex items-center justify-between border-b-4 border-[#1a1a1a] pb-4">
+<h4 class="text-3xl font-black font-headline uppercase tracking-tighter">Service History Timeline</h4>
+<div class="flex gap-4">
+<button class="text-sm font-bold font-headline uppercase flex items-center gap-1 bg-white border-2 border-black px-4 py-1 neubrutal-shadow-sm">
+<span class="material-symbols-outlined text-base">filter_list</span> Filter
+                        </button>
+<button class="text-sm font-bold font-headline uppercase flex items-center gap-1 bg-white border-2 border-black px-4 py-1 neubrutal-shadow-sm">
+<span class="material-symbols-outlined text-base">download</span> Export Log
+                        </button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Timeline Entry 1 -->
+<div class="grid grid-cols-12 gap-0 border-[3px] border-[#1a1a1a] bg-white group hover:bg-primary-container transition-colors duration-200">
+<div class="col-span-12 md:col-span-2 border-r-[3px] border-[#1a1a1a] p-4 flex flex-col justify-center items-center bg-[#f0eded] group-hover:bg-[#1a1a1a] group-hover:text-white transition-colors">
+<p class="font-label font-bold text-lg leading-none">12 OCT</p>
+<p class="font-label text-sm">2023</p>
+</div>
+<div class="col-span-12 md:col-span-3 border-r-[3px] border-[#1a1a1a] p-4">
+<p class="font-headline font-black uppercase text-xl leading-tight">Annual Inspection</p>
+<p class="text-xs font-bold uppercase opacity-60">Type: Scheduled Maintenance</p>
+</div>
+<div class="col-span-12 md:col-span-3 border-r-[3px] border-[#1a1a1a] p-4 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-6 h-6 rounded-full bg-black text-white text-[10px] flex items-center justify-center font-bold">JS</div>
+<span class="font-bold text-sm">Jeremy Sparks</span>
+</div>
+<p class="text-[10px] font-label font-bold text-secondary uppercase">Lead Tech / Performance Div.</p>
+</div>
+<div class="col-span-12 md:col-span-2 border-r-[3px] border-[#1a1a1a] p-4 flex flex-col justify-center">
+<p class="text-[10px] font-headline font-bold uppercase opacity-60 leading-none">Total Cost</p>
+<p class="text-2xl font-black font-label">€1,240.00</p>
+</div>
+<div class="col-span-12 md:col-span-2 p-4 flex gap-2 items-center justify-end">
+<div class="w-12 h-12 border-2 border-black overflow-hidden hover:scale-110 transition-transform cursor-pointer">
+<img alt="Oil filter change" data-alt="Oil filter and synthetic oil bottles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXy08Rgw3QyU_E-WFsC01Jwq3DquBbJ64eFgKFsVdz90zn_BAKRVJvMwBm2hVG0nW4AZbBtK952UyfiNGNixZMNMnYne-UPdxLqUaOhp-Vr-z7Vmr6--EBOhFM4ESj_o6hA9qhVQ2KB8qvC0PX1eJ2djdt2VOgpzJZLCybAR6TOJzn_Bor4IRfeoKgBOhY445D4DElpTMSS3S1msMPDaUt1Mj8e5h2Y2e7bJSqtHWmZmWkak65bebeA3bSk_5RGyXswIFlZCfPRg"/>
+</div>
+<div class="w-12 h-12 border-2 border-black overflow-hidden hover:scale-110 transition-transform cursor-pointer">
+<img alt="Brake pad inspection" data-alt="Close up of sports car ceramic brakes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa-aoXohvBjGEZAuZ66nb63VcZorUnoZZbPJPBFVZ2F7-K0OIx-eGiT7xhwbWXaNn4rvB94KDXdj3suxbd2ExNu9dFfzEXxJnupnLMRHIDnIXNLHeAojR5Ay1nMZ5fD7y1dLNtPuizLXXQHGJsXX6OqaBnqqUoMkq6ZR8m6hEqCVV4WoedF_zzSLPSgRphH-YB6kGaICW-UI6auf7LTotH86nS1LTyhAqbdbk_yAIx7Lx0-1TbTTjcSv2VPk_al-83IetVE6bqgg"/>
+</div>
+<button class="w-8 h-8 border-2 border-black bg-white flex items-center justify-center neubrutal-shadow-sm">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Timeline Entry 2 -->
+<div class="grid grid-cols-12 gap-0 border-[3px] border-[#1a1a1a] bg-white group hover:bg-primary-container transition-colors duration-200">
+<div class="col-span-12 md:col-span-2 border-r-[3px] border-[#1a1a1a] p-4 flex flex-col justify-center items-center bg-[#f0eded] group-hover:bg-[#1a1a1a] group-hover:text-white transition-colors">
+<p class="font-label font-bold text-lg leading-none">05 JUN</p>
+<p class="font-label text-sm">2023</p>
+</div>
+<div class="col-span-12 md:col-span-3 border-r-[3px] border-[#1a1a1a] p-4">
+<p class="font-headline font-black uppercase text-xl leading-tight">Brake Fluid Flush</p>
+<p class="text-xs font-bold uppercase opacity-60">Type: Fluid Exchange</p>
+</div>
+<div class="col-span-12 md:col-span-3 border-r-[3px] border-[#1a1a1a] p-4 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-6 h-6 rounded-full bg-black text-white text-[10px] flex items-center justify-center font-bold">MK</div>
+<span class="font-bold text-sm">Mike Kowalski</span>
+</div>
+<p class="text-[10px] font-label font-bold text-secondary uppercase">Hydraulics Specialist</p>
+</div>
+<div class="col-span-12 md:col-span-2 border-r-[3px] border-[#1a1a1a] p-4 flex flex-col justify-center">
+<p class="text-[10px] font-headline font-bold uppercase opacity-60 leading-none">Total Cost</p>
+<p class="text-2xl font-black font-label">€320.50</p>
+</div>
+<div class="col-span-12 md:col-span-2 p-4 flex gap-2 items-center justify-end">
+<div class="w-12 h-12 border-2 border-black overflow-hidden hover:scale-110 transition-transform cursor-pointer">
+<img alt="Hydraulic sensor" data-alt="Technical view of hydraulic brake components" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJnuB798a7oCEG2zCjmrAiW50l7YgZU1ESCQoYfIattzTZJhAfMCgWemhxNGh5tSGLOfx5GiAYdLfxG79A2eiEay2-v2SiDBOYrb5lvdtJM-tq3ZlfCdwCKukr4Lp23xzHbfPAYp5mEjIJqfH-5icqRH35vjDgYoJltfjG01ByFuYkLgtxg7dzabIPQUMMPP-j27BmBBo1KJUct2-2UFmcwVO5d3zWBlJbXTncMDEF8XIUzmMN4RP65K2a_pK7QHiiAde-Z1pDHA"/>
+</div>
+<button class="w-8 h-8 border-2 border-black bg-white flex items-center justify-center neubrutal-shadow-sm">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Timeline Entry 3 (Warning Red for Critical Repairs) -->
+<div class="grid grid-cols-12 gap-0 border-[3px] border-secondary-container bg-white group hover:bg-secondary-container transition-colors duration-200">
+<div class="col-span-12 md:col-span-2 border-r-[3px] border-secondary-container p-4 flex flex-col justify-center items-center bg-error-container group-hover:bg-secondary group-hover:text-white transition-colors">
+<p class="font-label font-bold text-lg leading-none">18 MAR</p>
+<p class="font-label text-sm">2023</p>
+</div>
+<div class="col-span-12 md:col-span-3 border-r-[3px] border-secondary-container p-4">
+<p class="font-headline font-black uppercase text-xl leading-tight">Track Gearbox Calibration</p>
+<p class="text-xs font-bold uppercase opacity-60 group-hover:text-white">Type: Performance Tuning</p>
+</div>
+<div class="col-span-12 md:col-span-3 border-r-[3px] border-secondary-container p-4 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-6 h-6 rounded-full bg-black text-white text-[10px] flex items-center justify-center font-bold">DM</div>
+<span class="font-bold text-sm group-hover:text-white">Dmitri Volkov</span>
+</div>
+<p class="text-[10px] font-label font-bold text-secondary uppercase group-hover:text-white">Drivetrain Expert</p>
+</div>
+<div class="col-span-12 md:col-span-2 border-r-[3px] border-secondary-container p-4 flex flex-col justify-center">
+<p class="text-[10px] font-headline font-bold uppercase opacity-60 leading-none group-hover:text-white">Total Cost</p>
+<p class="text-2xl font-black font-label group-hover:text-white">€2,890.00</p>
+</div>
+<div class="col-span-12 md:col-span-2 p-4 flex gap-2 items-center justify-end">
+<div class="w-12 h-12 border-2 border-black overflow-hidden hover:scale-110 transition-transform cursor-pointer">
+<img alt="Gearbox scan" data-alt="Electronic diagnostic screen showing gearbox data" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiAKj0c9nI5BMMawcy4ca1hglTNKV71iIT_Nmh9tCNDXQXcx1b4dQ_5miefTSx6mEndBCheYKPEi-gTJdmYL7kfyuMooFojCGF7NPsYUbvjyCMuAMxFWNSj8wMKBEhQRGiXpCdWsntAfi5j5fk-Rqm6bB_cPxCu7LuzbRt_NYTG8ZRntYAtxeb4Ig6hJFALjORmNLSgo_EaJGdH808MoNyU9s_rtr_r6_tB1kLhWeDZytXb00ANaWr-fZ8AvsnJQku2qu-mY3WDQ"/>
+</div>
+<button class="w-8 h-8 border-2 border-black bg-white flex items-center justify-center neubrutal-shadow-sm">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Additional Detail Sections -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12">
+<div class="bg-white border-[3px] border-[#1a1a1a] p-6 neubrutal-shadow">
+<h5 class="font-headline font-black text-lg uppercase mb-4 border-b-2 border-black pb-2">Active Recalls</h5>
+<div class="flex items-start gap-3 bg-[#FFE500] p-3 border-2 border-black">
+<span class="material-symbols-outlined text-2xl">warning</span>
+<p class="text-xs font-bold leading-tight">NO ACTIVE RECALLS FOUND FOR THIS VIN. LAST CHECK: 12.04.2024</p>
+</div>
+</div>
+<div class="bg-white border-[3px] border-[#1a1a1a] p-6 neubrutal-shadow">
+<h5 class="font-headline font-black text-lg uppercase mb-4 border-b-2 border-black pb-2">Next Service</h5>
+<div class="flex flex-col gap-1">
+<p class="text-3xl font-black font-label">8,500 KM</p>
+<p class="text-[10px] font-bold font-headline uppercase opacity-60">Estimated: September 2024</p>
+<div class="w-full bg-[#f0eded] h-4 mt-2 border-2 border-black">
+<div class="bg-primary-container h-full w-[65%] border-r-2 border-black"></div>
+</div>
+</div>
+</div>
+<div class="bg-[#1a1a1a] text-white border-[3px] border-[#1a1a1a] p-6 neubrutal-shadow relative overflow-hidden">
+<div class="relative z-10">
+<h5 class="font-headline font-black text-lg uppercase mb-2 text-[#FFE500]">Parts Inventory</h5>
+<p class="text-xs font-body opacity-80 mb-4">Commonly used parts for this GT3 model are currently in stock.</p>
+<button class="w-full bg-[#FFE500] text-black font-black font-headline text-xs py-2 border-2 border-black neubrutal-active uppercase">Check Stock Levels</button>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl opacity-10">inventory_2</span>
+</div>
+</div>
+</div>
+</main>
+</body></html>

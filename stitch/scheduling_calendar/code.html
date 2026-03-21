@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MYGARAGE | SCHEDULING</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#fcf9f8",
+                        "surface-container-highest": "#e5e2e1",
+                        "secondary": "#ae2f34",
+                        "outline": "#7d775f",
+                        "on-tertiary-container": "#0b69aa",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#dec800",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#ff6b6b",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#d3e6ff",
+                        "inverse-surface": "#313030",
+                        "primary-fixed": "#fee400",
+                        "on-secondary-fixed-variant": "#8c1520",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#dec800",
+                        "surface-container-low": "#f6f3f2",
+                        "surface": "#fcf9f8",
+                        "surface-tint": "#6a5f00",
+                        "on-tertiary-fixed": "#001d35",
+                        "primary-container": "#ffe500",
+                        "on-tertiary-fixed-variant": "#00497a",
+                        "primary": "#6a5f00",
+                        "on-secondary-container": "#6d0010",
+                        "surface-container": "#f0eded",
+                        "secondary-fixed": "#ffdad8",
+                        "tertiary-fixed": "#d0e4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "surface-variant": "#e5e2e1",
+                        "on-secondary-fixed": "#410006",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#4b4731",
+                        "outline-variant": "#cec7aa",
+                        "on-surface": "#1c1b1b",
+                        "tertiary-fixed-dim": "#9ccaff",
+                        "surface-dim": "#dcd9d9",
+                        "surface-container-high": "#eae7e7",
+                        "surface-bright": "#fcf9f8",
+                        "on-primary-fixed": "#201c00",
+                        "on-primary-fixed-variant": "#504700",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#726600",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary": "#0062a0",
+                        "secondary-fixed-dim": "#ffb3b0"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neubrutal-shadow {
+            box-shadow: 4px 4px 0px #1a1a1a;
+        }
+        .neubrutal-shadow-sm {
+            box-shadow: 2px 2px 0px #1a1a1a;
+        }
+        .neubrutal-card-active:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #1a1a1a;
+        }
+        /* Custom scrollbar for neubrutalist feel */
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
+        ::-webkit-scrollbar-track { background: #F5F0E8; border-left: 3px solid #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #1a1a1a; border: 2px solid #F5F0E8; }
+    </style>
+</head>
+<body class="bg-[#F5F0E8] font-body text-[#1a1a1a] selection:bg-primary-container selection:text-black">
+<!-- SIDEBAR NAVIGATION (JSON MAPPED) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-[#1a1a1a] h-screen w-64 border-r-[3px] border-black shadow-[4px_0_0_0_#1a1a1a]">
+<div class="px-6 py-8 flex flex-col gap-1">
+<h1 class="text-[#FFE500] font-black italic font-headline text-2xl tracking-tighter">MYGARAGE</h1>
+<p class="font-headline font-bold uppercase tracking-wider text-xs text-stone-500">High-Octane Ops</p>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<!-- Active Tab: Calendar -->
+<a class="font-headline font-bold uppercase tracking-wider text-sm flex items-center gap-3 px-4 py-3 text-[#1a1a1a] bg-[#FFE500] border-y-[3px] border-black font-black transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Calendar</span>
+</a>
+<a class="font-headline font-bold uppercase tracking-wider text-sm flex items-center gap-3 px-4 py-3 text-stone-400 hover:text-white hover:bg-stone-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="font-headline font-bold uppercase tracking-wider text-sm flex items-center gap-3 px-4 py-3 text-stone-400 hover:text-white hover:bg-stone-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span>Work Orders</span>
+</a>
+<a class="font-headline font-bold uppercase tracking-wider text-sm flex items-center gap-3 px-4 py-3 text-stone-400 hover:text-white hover:bg-stone-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+<span>Vehicles</span>
+</a>
+<a class="font-headline font-bold uppercase tracking-wider text-sm flex items-center gap-3 px-4 py-3 text-stone-400 hover:text-white hover:bg-stone-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Customers</span>
+</a>
+</nav>
+<div class="p-4">
+<button class="w-full bg-[#FFE500] border-[3px] border-black neubrutal-shadow py-3 font-headline font-black uppercase tracking-widest text-sm neubrutal-card-active">
+                New Work Order
+            </button>
+</div>
+<div class="border-t-[3px] border-stone-800 p-4 space-y-2">
+<a class="font-headline font-bold uppercase tracking-wider text-xs flex items-center gap-3 px-4 py-2 text-stone-400 hover:text-white" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="font-headline font-bold uppercase tracking-wider text-xs flex items-center gap-3 px-4 py-2 text-stone-400 hover:text-white" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- MAIN CONTENT AREA -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TOP APP BAR (JSON MAPPED) -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-50 bg-[#F5F0E8] dark:bg-stone-900 border-b-[3px] border-[#1a1a1a]">
+<div class="flex items-center gap-8">
+<h2 class="font-headline font-black uppercase tracking-widest text-[#1a1a1a] text-xl">SCHEDULE MANAGER</h2>
+<div class="flex bg-white border-[3px] border-black px-4 py-1.5 neubrutal-shadow-sm">
+<span class="material-symbols-outlined text-[#1a1a1a] mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs font-label font-bold uppercase w-64" placeholder="SEARCH VIN, NAME, OR BAY..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4 text-[#1a1a1a]">
+<span class="material-symbols-outlined hover:bg-[#FFE500] p-1 transition-colors cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined hover:bg-[#FFE500] p-1 transition-colors cursor-pointer" data-icon="settings">settings</span>
+<span class="material-symbols-outlined hover:bg-[#FFE500] p-1 transition-colors cursor-pointer" data-icon="help">help</span>
+</div>
+<div class="h-10 w-10 border-[3px] border-black neubrutal-shadow-sm bg-primary-container overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="User avatar profile picture in neubrutalist style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYi81R53P4yj9cLLWuwce7yiizZtWD3v1uGzud5KdH0YeRyYuHQlhpFM-3ulcz8VXNz-dcUl51E5hYYZBnW7g-o-Uw2Nw_8Dr7cfbRyKEABhPqh8DPI8mA3j2KfZDnCSkotvCkyXPMk2d8nCbMVwiWH2I3LuW44kw7_vxwrkN97KcHDtwaP66QRswzsRUM24EAOsrWf-EjtSY3X4QtNlcf87Ebdjl9Jyk8kQ3qJE1SmD-66t6R0qJFvrq_YAgzqvnNrBp76Dnuyw"/>
+</div>
+</div>
+</header>
+<!-- DASHBOARD GRID -->
+<div class="p-8 grid grid-cols-12 gap-8 flex-1">
+<!-- CALENDAR COLUMN -->
+<div class="col-span-12 lg:col-span-9 flex flex-col gap-6">
+<!-- CALENDAR TOOLBAR -->
+<div class="flex justify-between items-end">
+<div>
+<p class="font-label font-bold text-secondary text-sm mb-1 uppercase tracking-tighter">// OCTOBER 2023</p>
+<h3 class="font-headline font-black text-4xl uppercase tracking-tighter">WEEK 42: PRODUCTION FLOW</h3>
+</div>
+<div class="flex gap-2">
+<button class="bg-white border-[3px] border-black p-2 neubrutal-shadow-sm neubrutal-card-active">
+<span class="material-symbols-outlined align-middle" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="bg-[#FFE500] border-[3px] border-black px-6 py-2 font-headline font-black uppercase tracking-widest neubrutal-shadow-sm neubrutal-card-active">
+                            TODAY
+                        </button>
+<button class="bg-white border-[3px] border-black p-2 neubrutal-shadow-sm neubrutal-card-active">
+<span class="material-symbols-outlined align-middle" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- WEEKLY CALENDAR VIEW -->
+<div class="bg-white border-[3px] border-black neubrutal-shadow flex flex-col overflow-hidden">
+<!-- Days Header -->
+<div class="grid grid-cols-8 border-b-[3px] border-black bg-stone-100">
+<div class="p-4 border-r-[3px] border-black flex items-center justify-center bg-[#1a1a1a] text-white">
+<span class="font-headline font-black text-xs uppercase tracking-widest">STATION</span>
+</div>
+<div class="p-4 border-r-[3px] border-black text-center group hover:bg-[#FFE500] transition-colors">
+<span class="block font-label text-[10px] text-stone-500 font-bold">MON</span>
+<span class="block font-headline font-black text-xl">23</span>
+</div>
+<div class="p-4 border-r-[3px] border-black text-center bg-[#FFE500]">
+<span class="block font-label text-[10px] text-black font-bold uppercase underline">TODAY</span>
+<span class="block font-headline font-black text-xl">24</span>
+</div>
+<div class="p-4 border-r-[3px] border-black text-center hover:bg-[#FFE500] transition-colors">
+<span class="block font-label text-[10px] text-stone-500 font-bold">WED</span>
+<span class="block font-headline font-black text-xl">25</span>
+</div>
+<div class="p-4 border-r-[3px] border-black text-center hover:bg-[#FFE500] transition-colors">
+<span class="block font-label text-[10px] text-stone-500 font-bold">THU</span>
+<span class="block font-headline font-black text-xl">26</span>
+</div>
+<div class="p-4 border-r-[3px] border-black text-center hover:bg-[#FFE500] transition-colors">
+<span class="block font-label text-[10px] text-stone-500 font-bold">FRI</span>
+<span class="block font-headline font-black text-xl">27</span>
+</div>
+<div class="p-4 border-r-[3px] border-black text-center hover:bg-[#FFE500] transition-colors">
+<span class="block font-label text-[10px] text-stone-500 font-bold">SAT</span>
+<span class="block font-headline font-black text-xl">28</span>
+</div>
+<div class="p-4 text-center bg-stone-200">
+<span class="block font-label text-[10px] text-stone-500 font-bold">SUN</span>
+<span class="block font-headline font-black text-xl">29</span>
+</div>
+</div>
+<!-- Bay Rows -->
+<div class="divide-y-[3px] divide-black">
+<!-- Bay 01 -->
+<div class="grid grid-cols-8 h-32 relative group">
+<div class="border-r-[3px] border-black bg-stone-50 p-4 flex flex-col justify-center items-center">
+<span class="font-headline font-black text-2xl italic tracking-tighter">B-01</span>
+<span class="font-label text-[10px] font-bold uppercase bg-black text-white px-2 mt-1">LIFT</span>
+</div>
+<!-- Bookings -->
+<div class="col-span-7 grid grid-cols-7 relative">
+<!-- Wednesday Booking -->
+<div class="absolute left-[28.5%] top-4 bottom-4 w-[25%] bg-tertiary-container border-[3px] border-black neubrutal-shadow-sm p-3 z-10 cursor-move group/item">
+<div class="flex justify-between items-start">
+<span class="font-headline font-black text-[10px] uppercase tracking-widest leading-none">BRAKE SERVICE</span>
+<span class="material-symbols-outlined text-sm" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<p class="font-label text-[9px] font-bold mt-1">FORD F-150 [RAPTOR]</p>
+<div class="mt-2 h-1 bg-black w-1/2"></div>
+</div>
+<!-- Empty Cells for Grid -->
+<div class="border-r-[3px] border-black flex items-center justify-center group/cell">
+<button class="opacity-0 group-hover/cell:opacity-100 bg-[#FFE500] border-[3px] border-black p-1 transition-opacity">
+<span class="material-symbols-outlined text-sm block" data-icon="add">add</span>
+</button>
+</div>
+<div class="border-r-[3px] border-black bg-stone-50/50"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="bg-stone-100/50"></div>
+</div>
+</div>
+<!-- Bay 02 -->
+<div class="grid grid-cols-8 h-32 relative group">
+<div class="border-r-[3px] border-black bg-stone-50 p-4 flex flex-col justify-center items-center">
+<span class="font-headline font-black text-2xl italic tracking-tighter">B-02</span>
+<span class="font-label text-[10px] font-bold uppercase bg-black text-white px-2 mt-1">ALIGN</span>
+</div>
+<div class="col-span-7 grid grid-cols-7 relative">
+<!-- Mon-Tue Booking -->
+<div class="absolute left-4 top-4 bottom-4 w-[24%] bg-secondary-container border-[3px] border-black neubrutal-shadow-sm p-3 z-10 cursor-move">
+<span class="font-headline font-black text-[10px] uppercase tracking-widest leading-none">ENGINE REBUILD</span>
+<p class="font-label text-[9px] font-bold mt-1">PORSCHE 911 GT3</p>
+<div class="flex gap-1 mt-2">
+<div class="h-1 bg-black flex-1"></div>
+<div class="h-1 bg-black/20 flex-1"></div>
+</div>
+</div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="bg-stone-100/50"></div>
+</div>
+</div>
+<!-- Bay 03 -->
+<div class="grid grid-cols-8 h-32 relative group">
+<div class="border-r-[3px] border-black bg-stone-50 p-4 flex flex-col justify-center items-center">
+<span class="font-headline font-black text-2xl italic tracking-tighter">B-03</span>
+<span class="font-label text-[10px] font-bold uppercase bg-black text-white px-2 mt-1">FLUID</span>
+</div>
+<div class="col-span-7 grid grid-cols-7 relative">
+<!-- Fri-Sat Booking -->
+<div class="absolute left-[58%] top-4 bottom-4 w-[26%] bg-primary-container border-[3px] border-black neubrutal-shadow-sm p-3 z-10 cursor-move">
+<span class="font-headline font-black text-[10px] uppercase tracking-widest leading-none">DIAGNOSTICS</span>
+<p class="font-label text-[9px] font-bold mt-1">TESLA MODEL S</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs" data-icon="electric_car" style="font-variation-settings: 'FILL' 1;">electric_car</span>
+<span class="font-label text-[8px]">HIGH VOLTAGE</span>
+</div>
+</div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="border-r-[3px] border-black"></div>
+<div class="bg-stone-100/50"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- CAPACITY INDICATOR -->
+<div class="grid grid-cols-4 gap-4">
+<div class="bg-white border-[3px] border-black p-4 neubrutal-shadow">
+<p class="font-label text-[10px] font-bold uppercase mb-1">TOTAL UTILIZATION</p>
+<div class="flex items-end gap-2">
+<span class="font-headline font-black text-4xl leading-none">84%</span>
+<span class="material-symbols-outlined text-green-600 pb-1" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+<div class="bg-white border-[3px] border-black p-4 neubrutal-shadow">
+<p class="font-label text-[10px] font-bold uppercase mb-1">OPEN SLOTS</p>
+<span class="font-headline font-black text-4xl leading-none">12</span>
+</div>
+<div class="bg-white border-[3px] border-black p-4 neubrutal-shadow">
+<p class="font-label text-[10px] font-bold uppercase mb-1">TECH EFFICIENCY</p>
+<span class="font-headline font-black text-4xl leading-none">9.2</span>
+</div>
+<div class="bg-[#FFE500] border-[3px] border-black p-4 neubrutal-shadow flex items-center justify-between cursor-pointer hover:bg-black hover:text-[#FFE500] transition-colors group">
+<span class="font-headline font-black uppercase tracking-widest text-sm">BOOK NOW</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- RIGHT SIDEBAR: APPROVALS & TECHS -->
+<div class="col-span-12 lg:col-span-3 flex flex-col gap-8">
+<!-- PENDING APPROVALS -->
+<section>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-3 h-3 bg-secondary border-[2px] border-black"></div>
+<h4 class="font-headline font-black uppercase tracking-widest text-sm">PENDING APPROVAL</h4>
+</div>
+<div class="space-y-4">
+<!-- Request Card -->
+<div class="bg-white border-[3px] border-black p-4 neubrutal-shadow flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-secondary"></div>
+<div class="flex justify-between items-start">
+<span class="font-label text-[9px] font-black bg-stone-100 px-1 border border-black">#REQ-901</span>
+<span class="font-label text-[9px] font-bold">12:30 PM</span>
+</div>
+<h5 class="font-headline font-black text-sm uppercase tracking-tight">TRANSMISSION SWAP</h5>
+<p class="font-label text-[10px] text-stone-600 font-bold uppercase">RAM 2500 // CARLOS M.</p>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 bg-black text-white py-2 font-headline font-bold text-[10px] uppercase tracking-widest border-2 border-black neubrutal-card-active">DENY</button>
+<button class="flex-1 bg-[#FFE500] text-black py-2 font-headline font-bold text-[10px] uppercase tracking-widest border-2 border-black neubrutal-card-active">APPROVE</button>
+</div>
+</div>
+<!-- Request Card 2 -->
+<div class="bg-white border-[3px] border-black p-4 neubrutal-shadow flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-secondary"></div>
+<div class="flex justify-between items-start">
+<span class="font-label text-[9px] font-black bg-stone-100 px-1 border border-black">#REQ-904</span>
+<span class="font-label text-[9px] font-bold">2:45 PM</span>
+</div>
+<h5 class="font-headline font-black text-sm uppercase tracking-tight">OIL COOLER REPLACEMENT</h5>
+<p class="font-label text-[10px] text-stone-600 font-bold uppercase">BMW M4 // SARAH K.</p>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 bg-black text-white py-2 font-headline font-bold text-[10px] uppercase tracking-widest border-2 border-black neubrutal-card-active">DENY</button>
+<button class="flex-1 bg-[#FFE500] text-black py-2 font-headline font-bold text-[10px] uppercase tracking-widest border-2 border-black neubrutal-card-active">APPROVE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- TECHNICIAN STATUS -->
+<section class="flex-1">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-3 h-3 bg-tertiary border-[2px] border-black"></div>
+<h4 class="font-headline font-black uppercase tracking-widest text-sm">TEAM DEPLOYMENT</h4>
+</div>
+<div class="bg-[#1a1a1a] border-[3px] border-black p-1 neubrutal-shadow">
+<div class="bg-[#1a1a1a] text-white p-4 space-y-6">
+<!-- Tech 01 -->
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 border-2 border-[#FFE500] bg-stone-800 flex items-center justify-center">
+<img alt="Tech Avatar" class="w-full h-full object-cover" data-alt="Close up of mechanical technician portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIVmEM816cK4FMH8ldVFsCIUqgXfFxcJpmIBZr27J-Mh2ygAd7PjclQCzDhAJnZR598OH212v9DFRV-ZxcPaReLS2rVyw0dvZII0ypekM6OmNrOVRLdlIuQ4R3nJZus3kptV2EhpgkUZfhVYd0BvFaOTp21vcBo7hDcxT_aTp1Eo1oWanuJKMCPbML1h1KvsA7R8d8uJu_eKSOjc_2Bab9JUabOwHJ_bcdxJ1Ylx7xoJ2FG-hMtnO1FBdBeEo-C4xVmLMntptsbA"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline font-bold text-xs uppercase tracking-widest">A. RODRIGUEZ</span>
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+</div>
+<div class="w-full bg-stone-700 h-1.5 border border-black">
+<div class="bg-[#FFE500] h-full w-[70%]"></div>
+</div>
+<p class="font-label text-[8px] mt-1 text-stone-400 uppercase tracking-tighter">70% LOAD // ENGINE SPECIALIST</p>
+</div>
+</div>
+<!-- Tech 02 -->
+<div class="flex items-center gap-4 opacity-70">
+<div class="w-12 h-12 border-2 border-stone-600 bg-stone-800 flex items-center justify-center">
+<img alt="Tech Avatar" class="w-full h-full object-cover" data-alt="Mechanical technician profile photo grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARLFuw4xQRMkqhjK0Yrqsuy7Au2iv_gjC9mMINqfaQfsrlxv788LmojGGzW2MymGPmCup-5cdxxTB4Re4eIRhEsq1zb3AzhHiSOy_Z3CFEk1tk6OZby9v-blXQ01uHA8zuTSgEJy68GgfL955E6RMEan4SUeSQ4qqetwQUf8vTc8tIO26DKou4_VBTQi3t1AxcK0QvHvlwVh6B8n04uI-3yvG9k8INUH-1WK14rvPGDMp84_eoPS31m4G0A1DMooUl2K4F9pNE0w"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline font-bold text-xs uppercase tracking-widest text-stone-500">J. KOWALSKI</span>
+<span class="font-label text-[8px] bg-stone-700 px-1 border border-black">ON BREAK</span>
+</div>
+<div class="w-full bg-stone-700 h-1.5 border border-black">
+<div class="bg-stone-500 h-full w-[0%]"></div>
+</div>
+<p class="font-label text-[8px] mt-1 text-stone-500 uppercase tracking-tighter">IDLE // BODY &amp; PAINT</p>
+</div>
+</div>
+<!-- Tech 03 -->
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 border-2 border-[#FFE500] bg-stone-800 flex items-center justify-center">
+<img alt="Tech Avatar" class="w-full h-full object-cover" data-alt="Female technician profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8Oh5gYGxQoaskX3OFr8BvE92rvySvjlttBntrMFiBRuGpZZDbQo8-ZJ_MqEt0grVueoqV2zdVrFWoFu56pcCtLr8kqFr54wsoCfIf_jwEkWj__HmcCtgBaCAic_tRwcjSNYV2V32c-0p1lFR8kubWsZLiMFrN8J7nbti4r-9hdmmr6WURmbP2zNsLbEOf3eoLdqLO7OZ9c3-z31IVaZVFzNvh40Wr1-XzK886Jd69f30fap_s0pmcA_J6ozaoJA-OLlXG35_jbg"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline font-bold text-xs uppercase tracking-widest text-white">M. LAWSON</span>
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+</div>
+<div class="w-full bg-stone-700 h-1.5 border border-black">
+<div class="bg-secondary h-full w-[95%]"></div>
+</div>
+<p class="font-label text-[8px] mt-1 text-stone-400 uppercase tracking-tighter">95% LOAD // MASTER ELECTRICIAN</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ANALYTICS MINI-CARD -->
+<div class="mt-auto border-t-[3px] border-black pt-6">
+<div class="bg-white border-[3px] border-black p-4 neubrutal-shadow relative overflow-hidden">
+<div class="flex justify-between items-center mb-4">
+<h4 class="font-headline font-black uppercase text-xs">REVENUE FORECAST</h4>
+<span class="material-symbols-outlined text-sm" data-icon="auto_graph">auto_graph</span>
+</div>
+<div class="flex items-end gap-1 h-12">
+<div class="bg-stone-200 w-full h-[30%]"></div>
+<div class="bg-stone-200 w-full h-[45%]"></div>
+<div class="bg-stone-200 w-full h-[40%]"></div>
+<div class="bg-[#FFE500] w-full h-[80%] border-t-[3px] border-black"></div>
+<div class="bg-stone-200 w-full h-[55%]"></div>
+<div class="bg-stone-200 w-full h-[65%]"></div>
+<div class="bg-stone-200 w-full h-[90%]"></div>
+</div>
+<p class="font-label font-bold text-[14px] mt-4">$14,200 <span class="text-[10px] text-stone-500 uppercase tracking-tighter">EST. WEEKLY</span></p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FLOATING ACTION BUTTON (SUPPRESSED AS PER TASK FOCUS ON CALENDAR, BUT OPTIONAL ACCORDING TO SYSTEM) -->
+<!-- We keep the "Book Now" slot in the grid for primary intent -->
+</body></html>

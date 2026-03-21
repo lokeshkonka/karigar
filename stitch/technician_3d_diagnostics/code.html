@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MYGARAGE | TECHNICIAN VIEW</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Space Grotesk (Headline/Label), Inter (Body), Space Mono (Technical) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Space+Grotesk:wght@700;900&amp;family=Space+Mono:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#F5F0E8",
+              "surface-container-highest": "#e5e2e1",
+              "secondary": "#ae2f34",
+              "outline": "#7d775f",
+              "on-tertiary-container": "#0b69aa",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#dec800",
+              "error-container": "#ffdad6",
+              "secondary-container": "#ff6b6b",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#d3e6ff",
+              "inverse-surface": "#313030",
+              "primary-fixed": "#fee400",
+              "on-secondary-fixed-variant": "#8c1520",
+              "on-error-container": "#93000a",
+              "primary-fixed-dim": "#dec800",
+              "surface-container-low": "#f6f3f2",
+              "surface": "#1a1a1a",
+              "surface-tint": "#6a5f00",
+              "on-tertiary-fixed": "#001d35",
+              "primary-container": "#FFE500",
+              "on-tertiary-fixed-variant": "#00497a",
+              "primary": "#6a5f00",
+              "on-secondary-container": "#6d0010",
+              "surface-container": "#f0eded",
+              "secondary-fixed": "#ffdad8",
+              "tertiary-fixed": "#d0e4ff",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1a1a1a",
+              "surface-variant": "#e5e2e1",
+              "on-secondary-fixed": "#410006",
+              "error": "#ba1a1a",
+              "on-error": "#ffffff",
+              "on-surface-variant": "#4b4731",
+              "outline-variant": "#cec7aa",
+              "on-surface": "#1c1b1b",
+              "tertiary-fixed-dim": "#9ccaff",
+              "surface-dim": "#dcd9d9",
+              "surface-container-high": "#eae7e7",
+              "surface-bright": "#fcf9f8",
+              "on-primary-fixed": "#201c00",
+              "on-primary-fixed-variant": "#504700",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#726600",
+              "inverse-on-surface": "#f3f0ef",
+              "tertiary": "#0062a0",
+              "secondary-fixed-dim": "#ffb3b0"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Space Grotesk", "sans-serif"],
+              "mono": ["Space Mono", "monospace"]
+            },
+            borderWidth: {
+              '3': '3px',
+            },
+            boxShadow: {
+              'neubrutal': '4px 4px 0px 0px #1a1a1a',
+              'neubrutal-sm': '2px 2px 0px 0px #1a1a1a',
+              'neubrutal-side': '4px 0 0 0 #1a1a1a',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .neubrutal-btn-active:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #1a1a1a;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background m-0 p-0 overflow-x-hidden">
+<!-- SideNavBar (Execution from JSON) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#1a1a1a] flex flex-col z-40 border-r-[3px] border-black shadow-[4px_0_0_0_#1a1a1a]">
+<div class="px-6 py-8">
+<h1 class="text-[#FFE500] font-black italic text-2xl tracking-tighter">MYGARAGE</h1>
+<p class="font-label font-bold uppercase tracking-wider text-xs text-stone-500 mt-1">High-Octane Ops</p>
+</div>
+<nav class="flex-grow">
+<ul class="space-y-1">
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">dashboard</span> Dashboard</a></li>
+<!-- ACTIVE TAB: Work Orders -->
+<li><a class="text-[#1a1a1a] bg-[#FFE500] border-y-[3px] border-black px-6 py-4 flex items-center gap-3 font-black font-label uppercase tracking-wider text-sm" href="#"><span class="material-symbols-outlined filled-icon" style="font-variation-settings: 'FILL' 1;">build</span> Work Orders</a></li>
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">directions_car</span> Vehicles</a></li>
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">group</span> Customers</a></li>
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">handyman</span> Inventory</a></li>
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">receipt_long</span> Billing</a></li>
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">calendar_today</span> Calendar</a></li>
+<li><a class="text-stone-400 hover:text-white px-6 py-3 flex items-center gap-3 font-label font-bold uppercase tracking-wider text-sm transition-all hover:bg-stone-800 hover:text-[#FFE500]" href="#"><span class="material-symbols-outlined">analytics</span> Analytics</a></li>
+</ul>
+</nav>
+<div class="p-6 border-t-[3px] border-black space-y-4">
+<button class="w-full bg-[#FFE500] text-[#1a1a1a] border-[3px] border-black font-black py-3 uppercase tracking-widest shadow-[3px_3px_0_0_#1a1a1a] neubrutal-btn-active">New Work Order</button>
+<div class="pt-4 space-y-2">
+<a class="flex items-center gap-3 text-stone-400 hover:text-white font-label text-xs uppercase font-bold transition-all" href="#"><span class="material-symbols-outlined text-sm">settings</span> Settings</a>
+<a class="flex items-center gap-3 text-secondary-container hover:text-red-400 font-label text-xs uppercase font-bold transition-all" href="#"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar (Execution from JSON) -->
+<header class="flex justify-between items-center w-full px-8 py-4 sticky top-0 z-50 bg-[#F5F0E8] border-b-[3px] border-[#1a1a1a]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+<h2 class="font-headline font-black uppercase tracking-widest text-xl text-[#1a1a1a]">VEHICLE DIAGNOSTICS</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center border-[3px] border-[#1a1a1a] bg-white px-3 py-1 shadow-neubrutal-sm">
+<span class="material-symbols-outlined mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 font-label font-bold uppercase text-xs w-48" placeholder="SEARCH VIN OR TAG..." type="text"/>
+</div>
+<div class="flex gap-4">
+<button class="p-2 border-[3px] border-[#1a1a1a] bg-white hover:bg-[#FFE500] transition-colors neubrutal-btn-active"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 border-[3px] border-[#1a1a1a] bg-white hover:bg-[#FFE500] transition-colors neubrutal-btn-active"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-2 border-[3px] border-[#1a1a1a] bg-white hover:bg-[#FFE500] transition-colors neubrutal-btn-active"><span class="material-symbols-outlined">help</span></button>
+</div>
+<div class="h-10 w-10 border-[3px] border-[#1a1a1a] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar of the technician" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-8J1lKLD_0O7VxlX-At4aSq40PlaiyQA-ZxjU-lvUTOijMNeyDsqyd7bZySb8XMo9JFwhvR3tH4obl7OnIbnDhcBf3FQydgIYVwA75oAK2Tuz1Kmw0p1FNoo44yNGI31i2rIgS2uACvYM3GR0_CUYL1q1OfdZ0umP6yE3IeTAh9_8lyXUKU6MeEPWP2-9HmGdUhf2QCRCItB4UI_pbFnWpD5aOn4s44xZZfbQjeJQotwZCfuv2-mT2CYEwSPGHfIXyNzgODtCCg"/>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="p-8 grid grid-cols-12 gap-8">
+<!-- Left Panel: Vehicle Identification (Bento Card) -->
+<section class="col-span-12 lg:col-span-3 space-y-8">
+<div class="bg-white border-[3px] border-black p-6 shadow-neubrutal">
+<h3 class="font-headline font-black uppercase tracking-widest text-lg mb-4 flex items-center gap-2">
+<span class="w-2 h-6 bg-[#1a1a1a]"></span> VEHICLE IDENTITY
+                    </h3>
+<div class="space-y-6">
+<div>
+<p class="font-label text-[10px] text-stone-400 uppercase font-black">Model</p>
+<p class="font-headline font-black text-2xl uppercase italic text-on-background">PORSCHE 911 GT3</p>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="bg-surface-container-low p-3 border-l-[3px] border-black">
+<p class="font-label text-[10px] text-stone-500 uppercase font-bold">VIN Number</p>
+<p class="font-mono text-sm tracking-tighter">WP0AC2A96JS1XXXXX</p>
+</div>
+<div class="bg-surface-container-low p-3 border-l-[3px] border-black">
+<p class="font-label text-[10px] text-stone-500 uppercase font-bold">Registration</p>
+<p class="font-mono text-sm tracking-tighter">LUX-911-GT</p>
+</div>
+<div class="bg-surface-container-low p-3 border-l-[3px] border-black">
+<p class="font-label text-[10px] text-stone-500 uppercase font-bold">Engine Code</p>
+<p class="font-mono text-sm tracking-tighter">MA175-H6-4.0L</p>
+</div>
+<div class="bg-surface-container-low p-3 border-l-[3px] border-black">
+<p class="font-label text-[10px] text-stone-500 uppercase font-bold">Odometer</p>
+<p class="font-mono text-lg font-black tracking-tighter">12,430 <span class="text-[10px]">KM</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Work Order Sidebar -->
+<div class="bg-white border-[3px] border-black p-6 shadow-neubrutal">
+<h3 class="font-headline font-black uppercase tracking-widest text-lg mb-4 flex items-center gap-2">
+<span class="w-2 h-6 bg-secondary-container"></span> ACTIVE TASK LIST
+                    </h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3 group">
+<div class="w-6 h-6 border-[3px] border-black bg-[#FFE500] flex items-center justify-center">
+<span class="material-symbols-outlined text-sm font-black">check</span>
+</div>
+<span class="font-label text-xs font-bold uppercase line-through text-stone-400">Initial Scan</span>
+</div>
+<div class="flex items-center gap-3 group">
+<div class="w-6 h-6 border-[3px] border-black bg-white flex items-center justify-center cursor-pointer hover:bg-stone-100 transition-colors">
+</div>
+<span class="font-label text-xs font-bold uppercase text-on-background">Visual Body Inspection</span>
+</div>
+<div class="flex items-center gap-3 group">
+<div class="w-6 h-6 border-[3px] border-black bg-white flex items-center justify-center cursor-pointer hover:bg-stone-100 transition-colors">
+</div>
+<span class="font-label text-xs font-bold uppercase text-on-background">Pin Damage Locations</span>
+</div>
+<div class="flex items-center gap-3 group">
+<div class="w-6 h-6 border-[3px] border-black bg-white flex items-center justify-center cursor-pointer hover:bg-stone-100 transition-colors">
+</div>
+<span class="font-label text-xs font-bold uppercase text-on-background">Oil Sample Collection</span>
+</div>
+<div class="flex items-center gap-3 group">
+<div class="w-6 h-6 border-[3px] border-black bg-white flex items-center justify-center cursor-pointer hover:bg-stone-100 transition-colors">
+</div>
+<span class="font-label text-xs font-bold uppercase text-on-background">Suspension Stress Test</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Middle Panel: 3D Diagnostics Viewer -->
+<section class="col-span-12 lg:col-span-6 space-y-6">
+<div class="bg-white border-[3px] border-black h-[600px] shadow-neubrutal relative overflow-hidden group">
+<!-- 3D Viewer Header Overlay -->
+<div class="absolute top-6 left-6 z-10 space-y-2">
+<div class="bg-[#1a1a1a] text-white px-4 py-2 border-[3px] border-black font-headline font-black uppercase tracking-widest text-sm inline-block">
+                            3D WIREFRAME MODEL V2.4
+                        </div>
+<div class="flex gap-2">
+<div class="bg-secondary-container text-white px-3 py-1 font-label font-bold text-[10px] uppercase border-[2px] border-black">3 FAULTS DETECTED</div>
+</div>
+</div>
+<!-- 3D Action Tools -->
+<div class="absolute bottom-6 right-6 z-10 flex flex-col gap-3">
+<button class="bg-[#FFE500] border-[3px] border-black p-3 shadow-neubrutal-sm neubrutal-btn-active" title="Rotate">
+<span class="material-symbols-outlined font-black">3d_rotation</span>
+</button>
+<button class="bg-white border-[3px] border-black p-3 shadow-neubrutal-sm neubrutal-btn-active" title="Zoom In">
+<span class="material-symbols-outlined font-black">zoom_in</span>
+</button>
+<button class="bg-white border-[3px] border-black p-3 shadow-neubrutal-sm neubrutal-btn-active" title="Exploded View">
+<span class="material-symbols-outlined font-black">layers</span>
+</button>
+</div>
+<!-- Main 3D Model Placeholder Representation (CSS/Grid based for layout) -->
+<div class="w-full h-full bg-[#f0f0f0] flex items-center justify-center relative overflow-hidden">
+<!-- Abstract "Floor" Grid -->
+<div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"></div>
+<!-- Simulated 3D Model Image (Representing a Porsche 911 3D Render) -->
+<div class="relative w-4/5 h-4/5 flex items-center justify-center">
+<img class="w-full h-auto object-contain drop-shadow-[20px_20px_0px_rgba(26,26,26,0.3)] grayscale-[0.5] contrast-125" data-alt="Technical 3D wireframe render of a silver Porsche 911 in a garage environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMJ-u-mWc8uZQOHX6-27DjK5B0Ljn12LFeqE4U_VaUn_DbD9uKfTwVR-KI1KFJuyVa3CU8BPDiqAtJMY9e7Qp2SA2Kzb4PGPV6WLtJ6lIbW6vkEuq_w4EUdOU5otbuJeWwPUTQk-DFRQN64HJdBStqhnolsaJmChXAqdgcfvLfWI3Ar75Mbnk0KwHx6RPqYAsRDXD-_QYEE1IJHg_5ILEBTPhvEkZOwJFEY8uF6K6glYXLdDgfOgjwdZwnGjFB3nHX_oNJGkTk1g"/>
+<!-- Damage Pin Markers (Red Dots) -->
+<div class="absolute top-1/2 left-[25%] group/pin">
+<div class="w-6 h-6 bg-secondary-container border-[3px] border-black animate-pulse flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[12px] font-black">report</span>
+</div>
+<div class="absolute top-[-40px] left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white px-2 py-1 text-[10px] font-label font-bold uppercase whitespace-nowrap border-[2px] border-black hidden group-hover/pin:block">
+                                    Front Fender Scuff
+                                </div>
+</div>
+<div class="absolute bottom-[30%] right-[30%] group/pin">
+<div class="w-6 h-6 bg-secondary-container border-[3px] border-black flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[12px] font-black">report</span>
+</div>
+<div class="absolute top-[-40px] left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white px-2 py-1 text-[10px] font-label font-bold uppercase whitespace-nowrap border-[2px] border-black hidden group-hover/pin:block">
+                                    Rear Tire Wear
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Interaction Area -->
+<div class="flex gap-4">
+<button class="flex-grow bg-[#FFE500] border-[3px] border-black py-6 px-4 shadow-neubrutal flex items-center justify-center gap-4 group neubrutal-btn-active">
+<span class="material-symbols-outlined text-3xl font-black">add_location_alt</span>
+<span class="font-headline font-black text-2xl uppercase tracking-tighter">RECORD DAMAGE / PIN MARKER</span>
+</button>
+<button class="bg-white border-[3px] border-black py-6 px-10 shadow-neubrutal flex items-center justify-center gap-4 neubrutal-btn-active">
+<span class="material-symbols-outlined text-3xl font-black">photo_camera</span>
+</button>
+</div>
+</section>
+<!-- Right Panel: Diagnostic Data & History -->
+<section class="col-span-12 lg:col-span-3 space-y-8">
+<div class="bg-white border-[3px] border-black p-6 shadow-neubrutal">
+<h3 class="font-headline font-black uppercase tracking-widest text-lg mb-4 flex items-center gap-2">
+<span class="w-2 h-6 bg-tertiary"></span> SYSTEM HEALTH
+                    </h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between font-label text-[10px] font-black uppercase">
+<span>Engine Compression</span>
+<span>98%</span>
+</div>
+<div class="w-full h-4 bg-stone-200 border-[2px] border-black relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-tertiary w-[98%] border-r-[2px] border-black"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-label text-[10px] font-black uppercase">
+<span>Brake Pad Life</span>
+<span class="text-secondary-container">15%</span>
+</div>
+<div class="w-full h-4 bg-stone-200 border-[2px] border-black relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-secondary-container w-[15%] border-r-[2px] border-black"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-label text-[10px] font-black uppercase">
+<span>Coolant Temp</span>
+<span>Optimal</span>
+</div>
+<div class="w-full h-4 bg-stone-200 border-[2px] border-black relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-[#FFE500] w-[65%] border-r-[2px] border-black"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[#1a1a1a] text-white border-[3px] border-black p-6 shadow-neubrutal">
+<h3 class="font-headline font-black uppercase tracking-widest text-lg mb-4 flex items-center gap-2">
+<span class="w-2 h-6 bg-[#FFE500]"></span> NOTES &amp; LOGS
+                    </h3>
+<div class="space-y-4 font-body text-xs">
+<div class="pb-4 border-b border-stone-700">
+<p class="text-[#FFE500] font-mono mb-1">09:42 AM - ADMIN</p>
+<p class="leading-relaxed">Vehicle arrived with reported knocking sound in front left axle during sharp turns.</p>
+</div>
+<div class="pb-4 border-b border-stone-700">
+<p class="text-[#FFE500] font-mono mb-1">10:15 AM - MECH_J3</p>
+<p class="leading-relaxed">Identified minor scuff on front fender. Pinned to 3D model. Proceeding to tire check.</p>
+</div>
+<textarea class="w-full bg-stone-800 border-[2px] border-stone-600 focus:border-[#FFE500] focus:ring-0 text-white font-label p-3 text-xs uppercase font-bold placeholder-stone-500 min-h-[100px]" placeholder="ADD TECHNICAL NOTE..."></textarea>
+<button class="w-full bg-white text-[#1a1a1a] border-[3px] border-black py-2 font-black uppercase text-xs shadow-neubrutal-sm neubrutal-btn-active">SAVE NOTE</button>
+</div>
+</div>
+<div class="bg-white border-[3px] border-black p-6 shadow-neubrutal">
+<button class="w-full bg-secondary-container text-white border-[3px] border-black py-4 font-headline font-black uppercase tracking-widest text-lg shadow-neubrutal neubrutal-btn-active">
+                        FINISH INSPECTION
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Visual Polish: Diagnostic Decorative Elements -->
+<div class="fixed bottom-4 left-72 flex gap-4 pointer-events-none opacity-20 hidden lg:flex">
+<div class="font-mono text-[10px] font-black uppercase">STATUS_LINK: CONNECTED</div>
+<div class="font-mono text-[10px] font-black uppercase">ENCRYPTION: 256_BIT</div>
+<div class="font-mono text-[10px] font-black uppercase">REFRESH: 60HZ</div>
+</div>
+</body></html>

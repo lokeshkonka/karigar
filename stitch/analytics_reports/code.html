@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics &amp; Reports | MYGARAGE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700;900&amp;family=Inter:wght@400;700&amp;family=Space+Mono:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#fcf9f8",
+              "surface-container-highest": "#e5e2e1",
+              "secondary": "#ae2f34",
+              "outline": "#7d775f",
+              "on-tertiary-container": "#0b69aa",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#dec800",
+              "error-container": "#ffdad6",
+              "secondary-container": "#ff6b6b",
+              "on-secondary": "#ffffff",
+              "tertiary-container": "#d3e6ff",
+              "inverse-surface": "#313030",
+              "primary-fixed": "#fee400",
+              "on-secondary-fixed-variant": "#8c1520",
+              "on-error-container": "#93000a",
+              "primary-fixed-dim": "#dec800",
+              "surface-container-low": "#f6f3f2",
+              "surface": "#fcf9f8",
+              "surface-tint": "#6a5f00",
+              "on-tertiary-fixed": "#001d35",
+              "primary-container": "#ffe500",
+              "on-tertiary-fixed-variant": "#00497a",
+              "primary": "#6a5f00",
+              "on-secondary-container": "#6d0010",
+              "surface-container": "#f0eded",
+              "secondary-fixed": "#ffdad8",
+              "tertiary-fixed": "#d0e4ff",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1c1b1b",
+              "surface-variant": "#e5e2e1",
+              "on-secondary-fixed": "#410006",
+              "error": "#ba1a1a",
+              "on-error": "#ffffff",
+              "on-surface-variant": "#4b4731",
+              "outline-variant": "#cec7aa",
+              "on-surface": "#1c1b1b",
+              "tertiary-fixed-dim": "#9ccaff",
+              "surface-dim": "#dcd9d9",
+              "surface-container-high": "#eae7e7",
+              "surface-bright": "#fcf9f8",
+              "on-primary-fixed": "#201c00",
+              "on-primary-fixed-variant": "#504700",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#726600",
+              "inverse-on-surface": "#f3f0ef",
+              "tertiary": "#0062a0",
+              "secondary-fixed-dim": "#ffb3b0"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Mono"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .neubrutal-shadow { box-shadow: 4px 4px 0px 0px #1a1a1a; }
+        .neubrutal-shadow-sm { box-shadow: 2px 2px 0px 0px #1a1a1a; }
+        .active-click:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px #1a1a1a; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #fcf9f8; }
+        ::-webkit-scrollbar-thumb { background: #1a1a1a; border: 3px solid #fcf9f8; }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-[#1a1a1a] h-screen w-64 border-r-[3px] border-black shadow-[4px_0_0_0_#1a1a1a]">
+<div class="px-6 py-8">
+<h1 class="text-[#FFE500] font-black italic text-2xl font-headline tracking-tighter">MYGARAGE</h1>
+<p class="text-stone-500 font-headline font-bold uppercase tracking-wider text-[10px] mt-1">High-Octane Ops</p>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="text-stone-400 hover:text-white px-4 py-3 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-sm hover:bg-stone-800 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-stone-400 hover:text-white px-4 py-3 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-sm hover:bg-stone-800 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+                Work Orders
+            </a>
+<a class="text-stone-400 hover:text-white px-4 py-3 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-sm hover:bg-stone-800 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+                Vehicles
+            </a>
+<a class="text-[#1a1a1a] bg-[#FFE500] border-y-[3px] border-black font-black px-4 py-3 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-sm active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Analytics
+            </a>
+<a class="text-stone-400 hover:text-white px-4 py-3 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-sm hover:bg-stone-800 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                Customers
+            </a>
+<a class="text-stone-400 hover:text-white px-4 py-3 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-sm hover:bg-stone-800 transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="handyman">handyman</span>
+                Inventory
+            </a>
+</nav>
+<div class="p-4 mt-auto border-t-[3px] border-stone-800">
+<button class="w-full bg-[#FFE500] text-[#1a1a1a] border-[3px] border-black py-3 font-headline font-black uppercase tracking-widest text-sm neubrutal-shadow active-click flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New Work Order
+            </button>
+</div>
+<div class="p-4 space-y-1">
+<a class="text-stone-400 hover:text-white px-4 py-2 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-[11px] hover:bg-stone-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+<a class="text-stone-400 hover:text-white px-4 py-2 flex items-center gap-3 font-headline font-bold uppercase tracking-wider text-[11px] hover:bg-stone-800 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- Top App Bar Shell -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-8 py-4 bg-[#F5F0E8] border-b-[3px] border-[#1a1a1a]">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-headline font-black uppercase tracking-widest text-[#1a1a1a]">Analytics &amp; Reports</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-symbols-outlined text-[#1a1a1a]" data-icon="search">search</span>
+</span>
+<input class="bg-white border-[3px] border-[#1a1a1a] pl-10 pr-4 py-2 font-label text-sm focus:ring-0 focus:bg-[#FFE500] outline-none w-64" placeholder="SEARCH REPORTS..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 border-[3px] border-black bg-white hover:bg-[#FFE500] active-click">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 border-[3px] border-black bg-white hover:bg-[#FFE500] active-click">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-10 h-10 border-[3px] border-black overflow-hidden bg-[#FFE500]">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="Close up of professional garage manager avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk2MjEE10TPwwQU-fVp8dpMideWr5mNEG3iWYmL9yLBXhxvT7cc2BN7udIWMnCWo_n6JjcnRSKELl49vvzr8qktFkyDYPV6lK2cVznKN1qSL9SkFO_Epe_1uok5xGXNvYtjbv-IfR6HBF4n_opcK4vUNc6newDM8oTWOx9oG2iDiwo55dpGTM9HsgfO8uBk_M4GZ4lGYE5ubX_cCEJdVpEpnzgPRtPq-_9lg7ia01QlJn_A952BvQFCuttOgjiFsJI0HnUls-9Sw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Analytics Content -->
+<div class="p-8 max-w-7xl mx-auto space-y-12">
+<!-- Key Metric Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-white border-[3px] border-black p-6 neubrutal-shadow relative group">
+<div class="absolute -top-4 -right-2 bg-secondary text-white border-[2px] border-black px-2 py-1 font-label text-[10px] font-bold">+12.5%</div>
+<p class="font-headline font-bold uppercase tracking-widest text-xs text-stone-500 mb-2">Total Revenue</p>
+<h3 class="text-4xl font-headline font-black">$42,850</h3>
+<p class="font-label text-[10px] text-stone-400 mt-2 uppercase">Current Month (Oct)</p>
+</div>
+<div class="bg-white border-[3px] border-black p-6 neubrutal-shadow">
+<p class="font-headline font-bold uppercase tracking-widest text-xs text-stone-500 mb-2">Avg. Ticket Size</p>
+<h3 class="text-4xl font-headline font-black">$642</h3>
+<p class="font-label text-[10px] text-stone-400 mt-2 uppercase">Up from $580 last month</p>
+</div>
+<div class="bg-[#FFE500] border-[3px] border-black p-6 neubrutal-shadow">
+<p class="font-headline font-bold uppercase tracking-widest text-xs text-[#1a1a1a] mb-2">Pending Jobs</p>
+<h3 class="text-4xl font-headline font-black text-[#1a1a1a]">18</h3>
+<p class="font-label text-[10px] text-[#1a1a1a] mt-2 uppercase">Estimated $12k pipeline</p>
+</div>
+<div class="bg-white border-[3px] border-black p-6 neubrutal-shadow">
+<p class="font-headline font-bold uppercase tracking-widest text-xs text-stone-500 mb-2">CSAT Rating</p>
+<h3 class="text-4xl font-headline font-black">4.9</h3>
+<p class="font-label text-[10px] text-stone-400 mt-2 uppercase">Based on 142 reviews</p>
+</div>
+</section>
+<!-- Main Charts Container -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Revenue Bar Chart Card -->
+<div class="lg:col-span-2 bg-white border-[3px] border-black p-8 neubrutal-shadow flex flex-col">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h4 class="text-2xl font-headline font-black uppercase tracking-widest">Revenue by Month</h4>
+<p class="font-label text-xs text-stone-500">FISCAL YEAR 2024 PERFORMANCE</p>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-white border-[3px] border-black font-headline font-bold uppercase text-xs active-click hover:bg-primary-container">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                            Export CSV
+                        </button>
+</div>
+<div class="flex-1 flex items-end gap-4 h-64 border-b-[3px] border-black pb-2 px-4">
+<div class="flex-1 bg-stone-100 border-[3px] border-black h-[40%] group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-black text-white text-[10px] px-2 py-1 font-label transition-opacity">$18k</div>
+</div>
+<div class="flex-1 bg-stone-100 border-[3px] border-black h-[55%] group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-black text-white text-[10px] px-2 py-1 font-label transition-opacity">$24k</div>
+</div>
+<div class="flex-1 bg-stone-100 border-[3px] border-black h-[45%] group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-black text-white text-[10px] px-2 py-1 font-label transition-opacity">$20k</div>
+</div>
+<div class="flex-1 bg-stone-100 border-[3px] border-black h-[75%] group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-black text-white text-[10px] px-2 py-1 font-label transition-opacity">$32k</div>
+</div>
+<div class="flex-1 bg-stone-100 border-[3px] border-black h-[65%] group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-black text-white text-[10px] px-2 py-1 font-label transition-opacity">$28k</div>
+</div>
+<div class="flex-1 bg-[#FFE500] border-[3px] border-black h-[90%] group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-100 bg-black text-[#FFE500] text-[10px] px-2 py-1 font-label">$42k</div>
+</div>
+</div>
+<div class="flex justify-between mt-4 px-4 font-label text-[10px] uppercase text-stone-500">
+<span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span class="font-bold text-black">Oct</span>
+</div>
+</div>
+<!-- Job Type Pie Chart Area -->
+<div class="bg-white border-[3px] border-black p-8 neubrutal-shadow">
+<div class="flex justify-between items-start mb-10">
+<h4 class="text-xl font-headline font-black uppercase tracking-widest leading-none">Revenue<br/>by Job Type</h4>
+<button class="p-2 border-[3px] border-black bg-white hover:bg-primary-container active-click">
+<span class="material-symbols-outlined" data-icon="file_download">file_download</span>
+</button>
+</div>
+<div class="relative w-48 h-48 mx-auto mb-8">
+<div class="absolute inset-0 rounded-full border-[12px] border-black"></div>
+<div class="absolute inset-0 rounded-full border-[12px] border-[#FFE500]" style="clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 70%);"></div>
+<div class="absolute inset-0 rounded-full border-[12px] border-tertiary" style="clip-path: polygon(50% 50%, 100% 70%, 100% 100%, 0% 100%, 0% 80%);"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-headline font-black text-2xl">100%</span>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-[#FFE500] border-[2px] border-black"></div>
+<span class="font-label text-[11px] uppercase">Engine Repair</span>
+</div>
+<span class="font-headline font-bold">42%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-tertiary border-[2px] border-black"></div>
+<span class="font-label text-[11px] uppercase">Body Work</span>
+</div>
+<span class="font-headline font-bold">35%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-stone-200 border-[2px] border-black"></div>
+<span class="font-label text-[11px] uppercase">Maintenance</span>
+</div>
+<span class="font-headline font-bold">23%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mechanic Performance & Heatmap Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Table: Mechanic Performance -->
+<div class="bg-white border-[3px] border-black p-8 neubrutal-shadow">
+<div class="flex justify-between items-center mb-8">
+<h4 class="text-2xl font-headline font-black uppercase tracking-widest">Mechanic Efficiency</h4>
+<button class="px-4 py-2 border-[3px] border-black bg-white font-headline font-bold uppercase text-xs active-click hover:bg-stone-100">Full Roster</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b-[3px] border-black">
+<th class="py-4 font-headline font-black uppercase tracking-widest text-xs">Name</th>
+<th class="py-4 font-headline font-black uppercase tracking-widest text-xs">Jobs</th>
+<th class="py-4 font-headline font-black uppercase tracking-widest text-xs">Avg Time</th>
+<th class="py-4 font-headline font-black uppercase tracking-widest text-xs text-right">Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b-[2px] border-stone-200 hover:bg-[#FFE500]/10 transition-colors">
+<td class="py-4 font-headline font-bold uppercase text-sm">Marcus V.</td>
+<td class="py-4 font-label text-sm">42</td>
+<td class="py-4 font-label text-sm">3.2 Hrs</td>
+<td class="py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<span class="font-headline font-black">4.9</span>
+<span class="material-symbols-outlined text-xs text-[#FFE500]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</td>
+</tr>
+<tr class="border-b-[2px] border-stone-200 hover:bg-[#FFE500]/10 transition-colors">
+<td class="py-4 font-headline font-bold uppercase text-sm">Sarah J.</td>
+<td class="py-4 font-label text-sm">38</td>
+<td class="py-4 font-label text-sm">2.8 Hrs</td>
+<td class="py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<span class="font-headline font-black">4.7</span>
+<span class="material-symbols-outlined text-xs text-[#FFE500]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</td>
+</tr>
+<tr class="border-b-[2px] border-stone-200 hover:bg-[#FFE500]/10 transition-colors">
+<td class="py-4 font-headline font-bold uppercase text-sm">Toby R.</td>
+<td class="py-4 font-label text-sm">31</td>
+<td class="py-4 font-label text-sm">4.1 Hrs</td>
+<td class="py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<span class="font-headline font-black">4.5</span>
+<span class="material-symbols-outlined text-xs text-[#FFE500]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Job Duration Heatmap -->
+<div class="bg-white border-[3px] border-black p-8 neubrutal-shadow">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h4 class="text-2xl font-headline font-black uppercase tracking-widest">Job Load Heatmap</h4>
+<p class="font-label text-xs text-stone-500">AVERAGE DURATION BY DAY &amp; TIME</p>
+</div>
+<span class="material-symbols-outlined text-3xl text-stone-400" data-icon="schedule">schedule</span>
+</div>
+<div class="grid grid-cols-6 gap-2">
+<!-- Days Legend -->
+<div class="col-span-1 space-y-2">
+<div class="h-8 flex items-center justify-end pr-2 font-label text-[10px] uppercase">Mon</div>
+<div class="h-8 flex items-center justify-end pr-2 font-label text-[10px] uppercase">Tue</div>
+<div class="h-8 flex items-center justify-end pr-2 font-label text-[10px] uppercase">Wed</div>
+<div class="h-8 flex items-center justify-end pr-2 font-label text-[10px] uppercase">Thu</div>
+<div class="h-8 flex items-center justify-end pr-2 font-label text-[10px] uppercase">Fri</div>
+</div>
+<!-- Heatmap Grid -->
+<div class="col-span-5 grid grid-cols-5 gap-2">
+<!-- 8 AM -->
+<div class="h-8 bg-[#FFE500]/20 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/40 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/60 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/20 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/40 border-[2px] border-black"></div>
+<!-- 10 AM -->
+<div class="h-8 bg-[#FFE500]/60 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/90 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/100 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/60 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/80 border-[2px] border-black"></div>
+<!-- 12 PM -->
+<div class="h-8 bg-[#FFE500]/10 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/20 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/30 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/10 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/20 border-[2px] border-black"></div>
+<!-- 2 PM -->
+<div class="h-8 bg-[#FFE500]/80 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/100 border-[2px] border-black"></div>
+<div class="h-8 bg-secondary border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/80 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/60 border-[2px] border-black"></div>
+<!-- 4 PM -->
+<div class="h-8 bg-[#FFE500]/40 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/20 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/20 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/10 border-[2px] border-black"></div>
+<div class="h-8 bg-[#FFE500]/40 border-[2px] border-black"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 pl-12 font-label text-[10px] uppercase text-stone-500">
+<span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span>
+</div>
+</div>
+</div>
+<!-- Retention Sparklines Grid -->
+<section class="bg-[#1a1a1a] p-8 border-[3px] border-black neubrutal-shadow">
+<div class="flex justify-between items-center mb-8">
+<h4 class="text-2xl font-headline font-black uppercase tracking-widest text-[#FFE500]">Customer Retention</h4>
+<button class="flex items-center gap-2 px-4 py-2 bg-[#FFE500] text-[#1a1a1a] border-[3px] border-black font-headline font-black uppercase text-xs active-click">
+                        Generate Deep-Dive
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-stone-900 border-[2px] border-stone-700 p-6">
+<p class="font-headline font-bold uppercase text-[10px] text-stone-400 mb-1">Returning Clients</p>
+<div class="flex items-end gap-3">
+<h5 class="text-3xl font-headline font-black text-white">68%</h5>
+<div class="flex items-end gap-[2px] h-8 pb-1">
+<div class="w-1 bg-secondary h-2"></div>
+<div class="w-1 bg-secondary h-4"></div>
+<div class="w-1 bg-secondary h-3"></div>
+<div class="w-1 bg-secondary h-6"></div>
+<div class="w-1 bg-secondary h-5"></div>
+<div class="w-1 bg-[#FFE500] h-8"></div>
+</div>
+</div>
+<p class="font-label text-[9px] text-stone-500 mt-2 uppercase">+4% FROM Q3</p>
+</div>
+<div class="bg-stone-900 border-[2px] border-stone-700 p-6">
+<p class="font-headline font-bold uppercase text-[10px] text-stone-400 mb-1">Referral Rate</p>
+<div class="flex items-end gap-3">
+<h5 class="text-3xl font-headline font-black text-white">14%</h5>
+<div class="flex items-end gap-[2px] h-8 pb-1">
+<div class="w-1 bg-stone-700 h-6"></div>
+<div class="w-1 bg-stone-700 h-5"></div>
+<div class="w-1 bg-stone-700 h-7"></div>
+<div class="w-1 bg-stone-700 h-4"></div>
+<div class="w-1 bg-stone-700 h-6"></div>
+<div class="w-1 bg-[#FFE500] h-5"></div>
+</div>
+</div>
+<p class="font-label text-[9px] text-stone-500 mt-2 uppercase">-1% FROM Q3</p>
+</div>
+<div class="bg-stone-900 border-[2px] border-stone-700 p-6">
+<p class="font-headline font-bold uppercase text-[10px] text-stone-400 mb-1">Churn Velocity</p>
+<div class="flex items-end gap-3">
+<h5 class="text-3xl font-headline font-black text-white">2.4%</h5>
+<div class="flex items-end gap-[2px] h-8 pb-1">
+<div class="w-1 bg-tertiary h-8"></div>
+<div class="w-1 bg-tertiary h-6"></div>
+<div class="w-1 bg-tertiary h-5"></div>
+<div class="w-1 bg-tertiary h-4"></div>
+<div class="w-1 bg-tertiary h-3"></div>
+<div class="w-1 bg-[#FFE500] h-2"></div>
+</div>
+</div>
+<p class="font-label text-[9px] text-stone-500 mt-2 uppercase">IMPROVED BY 12%</p>
+</div>
+</div>
+</section>
+</div>
+<footer class="mt-12 p-12 bg-white border-t-[3px] border-black flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="space-y-2 text-center md:text-left">
+<h6 class="font-headline font-black uppercase tracking-widest text-lg">MyGarage Analytics Engine v4.0</h6>
+<p class="font-label text-xs text-stone-500 uppercase">Automated sync completed 4 minutes ago</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 border-[3px] border-black bg-white font-headline font-black uppercase tracking-widest text-xs active-click hover:bg-[#FFE500]">
+                    Print Full Report
+                </button>
+<button class="px-6 py-3 border-[3px] border-black bg-black text-white font-headline font-black uppercase tracking-widest text-xs active-click hover:bg-stone-800">
+                    Schedule Auto-Email
+                </button>
+</div>
+</footer>
+</main>
+</body></html>

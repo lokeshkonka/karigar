@@ -1,0 +1,107 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+bun.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+.env.test.local
+
+# Next.js build outputs
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.sublime-project
+*.sublime-workspace
+.history/
+.ionide/
+
+# OS files
+.DS_Store
+Thumbs.db
+.Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+pnpm-debug.log*
+build*.log
+
+# Testing
+.nyc_output/
+coverage/
+.coverage
+.pytest_cache/
+
+# Misc
+*.pem
+.cache/
+.eslintcache
+.stylelintcache
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+temp/
+
+# IDE workspace files
+.workspace
+.vscode-server/
+*.code-workspace
+
+# TypeScript
+*.tsbuildinfo
+dist/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Local development
+.env.local.example
+.local/
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+.TemporaryItems
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz

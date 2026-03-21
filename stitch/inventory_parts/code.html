@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Inventory &amp; Parts Management | MYGARAGE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700;800;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#6d0010",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#eae7e7",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#001d35",
+                        "surface-container-highest": "#e5e2e1",
+                        "tertiary-fixed": "#d0e4ff",
+                        "primary-container": "#ffe500",
+                        "surface-container": "#f0eded",
+                        "on-primary-fixed-variant": "#504700",
+                        "inverse-surface": "#313030",
+                        "on-secondary-fixed-variant": "#8c1520",
+                        "surface-container-low": "#f6f3f2",
+                        "tertiary": "#0062a0",
+                        "on-primary-fixed": "#201c00",
+                        "inverse-primary": "#dec800",
+                        "primary-fixed-dim": "#dec800",
+                        "background": "#fcf9f8",
+                        "tertiary-container": "#d3e6ff",
+                        "surface-tint": "#6a5f00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f3f0ef",
+                        "primary-fixed": "#fee400",
+                        "secondary-fixed": "#ffdad8",
+                        "on-primary-container": "#726600",
+                        "surface-dim": "#dcd9d9",
+                        "surface-variant": "#e5e2e1",
+                        "on-surface-variant": "#4b4731",
+                        "secondary-fixed-dim": "#ffb3b0",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1c1b1b",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cec7aa",
+                        "outline": "#7d775f",
+                        "tertiary-fixed-dim": "#9ccaff",
+                        "on-tertiary-container": "#0b69aa",
+                        "on-secondary-fixed": "#410006",
+                        "on-tertiary-fixed-variant": "#00497a",
+                        "surface": "#fcf9f8",
+                        "secondary": "#ae2f34",
+                        "primary": "#6a5f00",
+                        "secondary-container": "#ff6b6b",
+                        "error": "#ba1a1a"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Mono"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neubrutal-shadow {
+            box-shadow: 4px 4px 0px 0px #1a1a1a;
+        }
+        .neubrutal-shadow-red {
+            box-shadow: 4px 4px 0px 0px #ae2f34;
+        }
+        .active-click:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #1a1a1a;
+        }
+        .active-click-red:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #ae2f34;
+        }
+    </style>
+</head>
+<body class="bg-[#F5F0E8] font-body text-on-background">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-[#1a1a1a] w-64 border-r-4 border-[#1a1a1a] shadow-[4px_0_0_0_#1a1a1a]">
+<div class="mb-8">
+<h1 class="text-xl font-black text-[#FFE500] italic font-headline tracking-tighter">MYGARAGE</h1>
+<p class="text-[10px] font-bold text-[#FFE500] tracking-[0.2em] opacity-80 uppercase">HEAVY DUTY MGMT</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 p-3 text-white hover:text-[#FFE500] font-headline font-bold uppercase tracking-wider text-sm transition-all group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 p-3 text-white hover:text-[#FFE500] font-headline font-bold uppercase tracking-wider text-sm transition-all group" href="#">
+<span class="material-symbols-outlined">build</span>
+                Work Orders
+            </a>
+<a class="flex items-center gap-3 p-3 text-white hover:text-[#FFE500] font-headline font-bold uppercase tracking-wider text-sm transition-all group" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+                Vehicles
+            </a>
+<a class="flex items-center gap-3 p-3 text-white hover:text-[#FFE500] font-headline font-bold uppercase tracking-wider text-sm transition-all group" href="#">
+<span class="material-symbols-outlined">groups</span>
+                CRM
+            </a>
+<!-- Active State Logic for Inventory Screen -->
+<a class="flex items-center gap-3 p-3 bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] shadow-[4px_4px_0_0_#000] font-headline font-bold uppercase tracking-wider text-sm mb-2" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 p-3 text-white hover:text-[#FFE500] font-headline font-bold uppercase tracking-wider text-sm transition-all group" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+                Billing
+            </a>
+<a class="flex items-center gap-3 p-3 text-white hover:text-[#FFE500] font-headline font-bold uppercase tracking-wider text-sm transition-all group" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Analytics
+            </a>
+</nav>
+<button class="mt-auto bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] neubrutal-shadow p-4 font-headline font-black text-xs uppercase tracking-widest active-click">
+            NEW WORK ORDER
+        </button>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-30 bg-[#F5F0E8] border-b-4 border-[#1a1a1a] flex justify-between items-center w-full px-8 py-5">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-black text-[#1a1a1a] tracking-tighter font-headline uppercase">Inventory &amp; Parts</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<input class="bg-white border-3 border-[#1a1a1a] px-4 py-2 font-headline font-bold text-sm focus:ring-0 focus:bg-[#FFE500] outline-none w-64" placeholder="SEARCH PARTS..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-[#1a1a1a]">search</span>
+</div>
+<div class="flex gap-4">
+<button class="material-symbols-outlined text-[#1a1a1a] p-2 hover:bg-[#FFE500] border-2 border-transparent transition-colors">notifications</button>
+<button class="material-symbols-outlined text-[#1a1a1a] p-2 hover:bg-[#FFE500] border-2 border-transparent transition-colors">settings</button>
+<div class="w-10 h-10 border-2 border-[#1a1a1a] bg-[#FFE500] flex items-center justify-center font-headline font-black">JD</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-8 space-y-8">
+<!-- Summary Bar -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-white border-3 border-[#1a1a1a] p-6 neubrutal-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl">inventory_2</span>
+</div>
+<p class="font-headline font-black text-xs uppercase tracking-widest text-[#1a1a1a]/60">Total SKUs</p>
+<h3 class="text-4xl font-black font-headline mt-1">142</h3>
+</div>
+<div class="bg-white border-3 border-[#1a1a1a] p-6 neubrutal-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl">payments</span>
+</div>
+<p class="font-headline font-black text-xs uppercase tracking-widest text-[#1a1a1a]/60">Stock Value</p>
+<h3 class="text-4xl font-black font-headline mt-1">$8,241</h3>
+</div>
+<div class="bg-[#FFE500] border-3 border-[#1a1a1a] p-6 neubrutal-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -bottom-2 opacity-20">
+<span class="material-symbols-outlined text-8xl">warning</span>
+</div>
+<p class="font-headline font-black text-xs uppercase tracking-widest text-[#1a1a1a]">Low Stock</p>
+<h3 class="text-4xl font-black font-headline mt-1">5</h3>
+</div>
+<div class="bg-secondary-container border-3 border-[#1a1a1a] p-6 neubrutal-shadow relative overflow-hidden group">
+<div class="absolute -right-2 -bottom-2 opacity-20">
+<span class="material-symbols-outlined text-8xl">error</span>
+</div>
+<p class="font-headline font-black text-xs uppercase tracking-widest text-white">Out of Stock</p>
+<h3 class="text-4xl font-black font-headline mt-1 text-white">2</h3>
+</div>
+</section>
+<!-- Usage Report & Chart -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-white border-3 border-[#1a1a1a] p-8 neubrutal-shadow">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h4 class="font-headline font-black text-xl uppercase italic">Parts Usage Report</h4>
+<p class="text-sm font-medium opacity-60">Monthly consumption by category</p>
+</div>
+<div class="flex gap-2">
+<span class="w-4 h-4 bg-tertiary border-2 border-[#1a1a1a]"></span>
+<span class="text-[10px] font-bold uppercase">Brakes</span>
+<span class="w-4 h-4 bg-[#FFE500] border-2 border-[#1a1a1a]"></span>
+<span class="text-[10px] font-bold uppercase">Engine</span>
+</div>
+</div>
+<!-- Mock Chart -->
+<div class="flex items-end gap-4 h-48 w-full border-b-4 border-l-4 border-[#1a1a1a] p-2">
+<div class="relative flex-1 bg-tertiary border-2 border-[#1a1a1a] h-[40%] group hover:bg-[#FFE500] transition-colors">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black font-label">JAN</span>
+</div>
+<div class="relative flex-1 bg-tertiary border-2 border-[#1a1a1a] h-[65%] group hover:bg-[#FFE500] transition-colors">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black font-label">FEB</span>
+</div>
+<div class="relative flex-1 bg-[#FFE500] border-2 border-[#1a1a1a] h-[85%] group">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black font-label">MAR</span>
+</div>
+<div class="relative flex-1 bg-tertiary border-2 border-[#1a1a1a] h-[55%] group hover:bg-[#FFE500] transition-colors">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black font-label">APR</span>
+</div>
+<div class="relative flex-1 bg-tertiary border-2 border-[#1a1a1a] h-[95%] group hover:bg-[#FFE500] transition-colors">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black font-label">MAY</span>
+</div>
+<div class="relative flex-1 bg-tertiary border-2 border-[#1a1a1a] h-[70%] group hover:bg-[#FFE500] transition-colors">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black font-label">JUN</span>
+</div>
+</div>
+</div>
+<div class="bg-[#1a1a1a] text-white p-8 border-3 border-[#1a1a1a] neubrutal-shadow flex flex-col justify-center">
+<h4 class="font-headline font-black text-2xl text-[#FFE500] italic leading-none mb-4 uppercase">System Alert</h4>
+<p class="font-body text-sm mb-6 leading-relaxed opacity-80">
+                        Synthetic oil filters for heavy-duty trucks (SKU-882) are 80% below minimum threshold. Automated reorder suggested.
+                    </p>
+<button class="w-full bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] p-4 font-headline font-black uppercase tracking-widest text-sm active-click">
+                        EXECUTE BULK ORDER
+                    </button>
+</div>
+</section>
+<!-- Parts Grid -->
+<section class="space-y-6">
+<div class="flex justify-between items-center">
+<h4 class="font-headline font-black text-2xl uppercase tracking-tighter">Parts Catalog</h4>
+<div class="flex gap-4">
+<button class="bg-white border-3 border-[#1a1a1a] px-4 py-2 font-headline font-bold text-xs uppercase active-click flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+                        </button>
+<button class="bg-[#FFE500] border-3 border-[#1a1a1a] px-4 py-2 font-headline font-black text-xs uppercase neubrutal-shadow active-click flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> Add New Part
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Card 1: Normal -->
+<div class="bg-white border-3 border-[#1a1a1a] neubrutal-shadow p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h5 class="font-headline font-black text-lg uppercase leading-none">Oil Filter (Synthetic)</h5>
+<span class="font-label text-[10px] text-[#1a1a1a]/60 uppercase">SKU: 00-482-OFF</span>
+</div>
+<span class="bg-tertiary text-white border-2 border-[#1a1a1a] px-3 py-1 text-[10px] font-black uppercase">In Stock</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Stock Count</p>
+<p class="text-xl font-headline font-black">48</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Min Threshold</p>
+<p class="text-xl font-headline font-black">15</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Cost Price</p>
+<p class="text-xl font-headline font-black">$12.50</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Sell Price</p>
+<p class="text-xl font-headline font-black">$24.99</p>
+</div>
+</div>
+<button class="mt-auto w-full bg-white border-3 border-[#1a1a1a] py-3 font-headline font-black text-xs uppercase tracking-widest active-click hover:bg-[#f0f0f0]">
+                            Reorder Part
+                        </button>
+</div>
+<!-- Card 2: Low Stock -->
+<div class="bg-white border-3 border-[#ae2f34] neubrutal-shadow-red p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h5 class="font-headline font-black text-lg uppercase leading-none">Ceramic Brake Pads</h5>
+<span class="font-label text-[10px] text-[#1a1a1a]/60 uppercase">SKU: BP-009-CER</span>
+</div>
+<span class="bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] px-3 py-1 text-[10px] font-black uppercase">Low Stock</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="border-l-3 border-[#ae2f34] pl-3">
+<p class="text-[10px] font-black uppercase text-[#ae2f34]">Stock Count</p>
+<p class="text-xl font-headline font-black text-[#ae2f34]">4</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Min Threshold</p>
+<p class="text-xl font-headline font-black">10</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Cost Price</p>
+<p class="text-xl font-headline font-black">$45.00</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Sell Price</p>
+<p class="text-xl font-headline font-black">$89.99</p>
+</div>
+</div>
+<button class="mt-auto w-full bg-[#FFE500] border-3 border-[#1a1a1a] py-3 font-headline font-black text-xs uppercase tracking-widest active-click">
+                            Reorder Now
+                        </button>
+</div>
+<!-- Card 3: Out of Stock -->
+<div class="bg-white border-3 border-[#ae2f34] neubrutal-shadow-red p-6 flex flex-col relative overflow-hidden">
+<!-- Diagonal Stripe for Alert -->
+<div class="absolute -right-12 top-6 bg-[#ae2f34] text-white py-1 px-14 rotate-45 font-headline font-black text-[10px] uppercase">
+                            CRITICAL
+                        </div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h5 class="font-headline font-black text-lg uppercase leading-none">Spark Plug (Iridium)</h5>
+<span class="font-label text-[10px] text-[#1a1a1a]/60 uppercase">SKU: SP-772-IRD</span>
+</div>
+<span class="bg-[#ae2f34] text-white border-2 border-[#1a1a1a] px-3 py-1 text-[10px] font-black uppercase">Out of Stock</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="border-l-3 border-[#ae2f34] pl-3">
+<p class="text-[10px] font-black uppercase text-[#ae2f34]">Stock Count</p>
+<p class="text-xl font-headline font-black text-[#ae2f34]">0</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Min Threshold</p>
+<p class="text-xl font-headline font-black">20</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Cost Price</p>
+<p class="text-xl font-headline font-black">$8.20</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Sell Price</p>
+<p class="text-xl font-headline font-black">$18.50</p>
+</div>
+</div>
+<button class="mt-auto w-full bg-[#ae2f34] text-white border-3 border-[#1a1a1a] py-3 font-headline font-black text-xs uppercase tracking-widest active-click-red">
+                            EMERGENCY RESTOCK
+                        </button>
+</div>
+<!-- Card 4: Normal -->
+<div class="bg-white border-3 border-[#1a1a1a] neubrutal-shadow p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h5 class="font-headline font-black text-lg uppercase leading-none">Wiper Blades (24")</h5>
+<span class="font-label text-[10px] text-[#1a1a1a]/60 uppercase">SKU: WB-24-PREM</span>
+</div>
+<span class="bg-tertiary text-white border-2 border-[#1a1a1a] px-3 py-1 text-[10px] font-black uppercase">In Stock</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Stock Count</p>
+<p class="text-xl font-headline font-black">12</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Min Threshold</p>
+<p class="text-xl font-headline font-black">5</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Cost Price</p>
+<p class="text-xl font-headline font-black">$9.00</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Sell Price</p>
+<p class="text-xl font-headline font-black">$19.99</p>
+</div>
+</div>
+<button class="mt-auto w-full bg-white border-3 border-[#1a1a1a] py-3 font-headline font-black text-xs uppercase tracking-widest active-click hover:bg-[#f0f0f0]">
+                            Reorder Part
+                        </button>
+</div>
+<!-- Card 5: Low Stock -->
+<div class="bg-white border-3 border-[#ae2f34] neubrutal-shadow-red p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h5 class="font-headline font-black text-lg uppercase leading-none">Radiator Coolant (1gal)</h5>
+<span class="font-label text-[10px] text-[#1a1a1a]/60 uppercase">SKU: CL-5050-ORG</span>
+</div>
+<span class="bg-[#FFE500] text-[#1a1a1a] border-2 border-[#1a1a1a] px-3 py-1 text-[10px] font-black uppercase">Low Stock</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="border-l-3 border-[#ae2f34] pl-3">
+<p class="text-[10px] font-black uppercase text-[#ae2f34]">Stock Count</p>
+<p class="text-xl font-headline font-black text-[#ae2f34]">2</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Min Threshold</p>
+<p class="text-xl font-headline font-black">6</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Cost Price</p>
+<p class="text-xl font-headline font-black">$14.20</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Sell Price</p>
+<p class="text-xl font-headline font-black">$28.95</p>
+</div>
+</div>
+<button class="mt-auto w-full bg-[#FFE500] border-3 border-[#1a1a1a] py-3 font-headline font-black text-xs uppercase tracking-widest active-click">
+                            Reorder Now
+                        </button>
+</div>
+<!-- Card 6: Normal -->
+<div class="bg-white border-3 border-[#1a1a1a] neubrutal-shadow p-6 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h5 class="font-headline font-black text-lg uppercase leading-none">Serpentine Belt</h5>
+<span class="font-label text-[10px] text-[#1a1a1a]/60 uppercase">SKU: SB-881-GT</span>
+</div>
+<span class="bg-tertiary text-white border-2 border-[#1a1a1a] px-3 py-1 text-[10px] font-black uppercase">In Stock</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Stock Count</p>
+<p class="text-xl font-headline font-black">15</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Min Threshold</p>
+<p class="text-xl font-headline font-black">8</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Cost Price</p>
+<p class="text-xl font-headline font-black">$32.00</p>
+</div>
+<div class="border-l-3 border-[#1a1a1a] pl-3">
+<p class="text-[10px] font-black uppercase text-[#1a1a1a]/60">Sell Price</p>
+<p class="text-xl font-headline font-black">$64.50</p>
+</div>
+</div>
+<button class="mt-auto w-full bg-white border-3 border-[#1a1a1a] py-3 font-headline font-black text-xs uppercase tracking-widest active-click hover:bg-[#f0f0f0]">
+                            Reorder Part
+                        </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Contextual FAB Suppression: FAB hidden as per instructions for Management Screen -->
+</body></html>
