@@ -1,10 +1,9 @@
 import * as THREE from 'three';
+import { WebGPURenderer } from 'three/webgpu';
 
 type WebGLRendererInit = ConstructorParameters<typeof THREE.WebGLRenderer>[0];
 
-export async function createOptimizedRenderer(
-  props: WebGLRendererInit
-): Promise<THREE.WebGLRenderer> {
+export function createOptimizedRenderer(props: WebGLRendererInit): THREE.WebGLRenderer {
   const init = {
     ...(props || {}),
     antialias: false,
@@ -19,18 +18,9 @@ export async function createOptimizedRenderer(
 
   if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
     try {
-      const webgpuModule = await import('three/webgpu');
-      const webgpuRenderer = new webgpuModule.WebGPURenderer(
-        init as unknown as ConstructorParameters<
-          typeof webgpuModule.WebGPURenderer
-        >[0]
+      const webgpuRenderer = new WebGPURenderer(
+        init as unknown as ConstructorParameters<typeof WebGPURenderer>[0]
       );
-
-      const maybeInit = webgpuRenderer as unknown as { init?: () => Promise<void> };
-      if (typeof maybeInit.init === 'function') {
-        await maybeInit.init();
-      }
-
       (webgpuRenderer as unknown as { setPixelRatio: (value: number) => void }).setPixelRatio(pixelRatio);
       (webgpuRenderer as unknown as { toneMapping: THREE.ToneMapping }).toneMapping = THREE.NoToneMapping;
 
