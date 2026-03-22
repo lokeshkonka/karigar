@@ -27,19 +27,6 @@ const nextConfig: NextConfig = {
   // Force all pages to use React Server Components where possible
   reactStrictMode: true,
 
-  // Webpack tweaks for Three.js
-  webpack: (config, { isServer }) => {
-    // Prevent Three.js from being bundled on the server
-    if (isServer) {
-      config.externals = [
-        ...(Array.isArray(config.externals) ? config.externals : config.externals ? [config.externals] : []),
-        'three',
-        '@react-three/fiber',
-        '@react-three/drei',
-      ];
-    }
-    return config;
-  },
 };
 
 export default nextConfig;
