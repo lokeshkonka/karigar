@@ -41,7 +41,7 @@ export function VehicleModelViewer({
         <directionalLight position={[6, 10, 7]} intensity={1.15} />
         <pointLight position={[-6, 2, -4]} intensity={0.45} />
 
-        <CarMesh color={color} scaleX={scaleX} scaleZ={scaleZ} autoRotate={autoRotate} offsetZ={0.35} />
+        <CarMesh color={color} scaleX={scaleX} scaleZ={scaleZ} autoRotate={autoRotate} offsetZ={0.8} />
 
         {showControls && (
           <OrbitControls
