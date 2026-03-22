@@ -2,56 +2,35 @@
 
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stage, useGLTF, Html, Environment } from '@react-three/drei';
+import { Environment, Html, OrbitControls } from '@react-three/drei';
+import { CarMesh } from '@/components/3d/CarMesh';
 
-function Model({ url }: { url: string }) {
-  // Try loading if a real URL is provided, otherwise fallback to basic geometry for demo
-  try {
-    const { scene } = useGLTF(url);
-    return <primitive object={scene} />;
-  } catch (e) {
-    // Demo fallback Box if model fails or isn't yet physically provided
-    return (
-      <mesh>
-        <boxGeometry args={[2, 1, 4]} />
-        <meshStandardMaterial color="#FFE500" roughness={0.2} metalness={0.8} />
-      </mesh>
-    );
-  }
-}
-
-function LoadingFallback() {
+function LoaderFallback() {
   return (
     <Html center>
-      <div className="flex flex-col items-center">
-        <div className="w-16 h-16 border-neo border-t-electricYellow rounded-full animate-spin"></div>
-        <p className="mt-4 font-black uppercase tracking-widest text-white text-sm">Loading 3D Mesh...</p>
+      <div className="bg-[#1a1a1a] text-electricYellow px-4 py-2 border-2 border-electricYellow font-black uppercase tracking-widest text-xs">
+        Loading Camaro…
       </div>
     </Html>
   );
 }
 
-export function VehicleViewer({ modelUrl }: { modelUrl: string }) {
+export function VehicleViewer({ modelUrl: _modelUrl }: { modelUrl?: string }) {
   return (
-    <Canvas shadows camera={{ position: [4, 2, 6], fov: 45 }}>
-      <Suspense fallback={<LoadingFallback />}>
-        {/* Lights */}
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 10]} intensity={1} castShadow />
+    <Canvas shadows camera={{ position: [6, 2.4, 7], fov: 40 }}>
+      <Suspense fallback={<LoaderFallback />}>
+        <ambientLight intensity={0.35} />
+        <directionalLight position={[8, 12, 8]} intensity={2.1} castShadow />
         <Environment preset="city" />
-        
-        {/* The Model */}
-        <Stage adjustCamera intensity={0.5}>
-          <Model url={modelUrl} />
-        </Stage>
-        
-        <OrbitControls 
-          makeDefault 
-          autoRotate 
-          autoRotateSpeed={0.5} 
-          minPolarAngle={0} 
-          maxPolarAngle={Math.PI / 2} 
-        />
+
+        <CarMesh autoRotate color="#5f6c79" />
+
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.002, 0]} receiveShadow>
+          <planeGeometry args={[28, 28]} />
+          <meshStandardMaterial color="#e8ebef" roughness={0.72} metalness={0.1} />
+        </mesh>
+
+        <OrbitControls makeDefault autoRotate autoRotateSpeed={0.65} minDistance={3} maxDistance={18} />
       </Suspense>
     </Canvas>
   );

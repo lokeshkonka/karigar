@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Camera, ArrowRight, Check, Loader2, RotateCcw, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { extractDominantColor, estimateCarDimensions } from '@/lib/colorExtractor';
@@ -11,6 +11,7 @@ const VehicleModelViewer = dynamic(
   { ssr: false, loading: () => <div className="h-64 flex items-center justify-center bg-[#1a1a1a]/20 rounded font-bold text-sm">Rendering 3D preview...</div> }
 );
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/useAuthStore';
 
 type Step = 'intro' | 'top' | 'side' | 'processing' | 'result';
 
@@ -28,6 +29,8 @@ const PROCESSING_STEPS = [
 export default function ScanIntakePage() {
   const { vehicleId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user } = useAuthStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const topCanvasRef = useRef<HTMLCanvasElement>(null);
   const sideCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,6 +42,7 @@ export default function ScanIntakePage() {
   const [extractedColor, setExtractedColor] = useState('#888888');
   const [carScale, setCarScale] = useState({ scaleX: 1, scaleZ: 1 });
   const [saving, setSaving] = useState(false);
+  const scanSource = searchParams.get('source') || 'direct';
 
   const startCamera = useCallback(async () => {
     try {
@@ -115,15 +119,44 @@ export default function ScanIntakePage() {
     if (!vehicleId) return;
     setSaving(true);
 
+    const nowIso = new Date().toISOString();
+    const actor = {
+      scanned_by_user_id: user?.id || null,
+      scanned_by_name: user?.name || null,
+      scanned_by_role: user?.role || null,
+      source: scanSource,
+    };
+
+    const { data: currentVehicle } = await supabase
+      .from('vehicles')
+      .select('scan_3d_data')
+      .eq('id', vehicleId as string)
+      .maybeSingle();
+
+    const existingScan = (currentVehicle?.scan_3d_data || {}) as any;
+    const existingHistory = Array.isArray(existingScan?.history) ? existingScan.history : [];
+    const historyEvent = {
+      scanned_at: nowIso,
+      scaleX: carScale.scaleX,
+      scaleZ: carScale.scaleZ,
+      color: extractedColor,
+      ...actor,
+    };
+
+    const nextScanData = {
+      ...existingScan,
+      scaleX: carScale.scaleX,
+      scaleZ: carScale.scaleZ,
+      scanned_at: nowIso,
+      ...actor,
+      history: [historyEvent, ...existingHistory].slice(0, 20),
+    };
+
     const { error } = await supabase
       .from('vehicles')
       .update({
         color: extractedColor,
-        scan_3d_data: {
-          scaleX: carScale.scaleX,
-          scaleZ: carScale.scaleZ,
-          scanned_at: new Date().toISOString()
-        }
+        scan_3d_data: nextScanData
       })
       .eq('id', vehicleId as string);
 

@@ -46,7 +46,7 @@ export default function StaffScanPage() {
 
   useEffect(() => {
     if (selected) {
-      setQrUrl(`${window.location.origin}/scan-intake/${selected.id}`);
+      setQrUrl(`${window.location.origin}/scan-intake/${selected.id}?source=staff-qr`);
     }
   }, [selected]);
 
@@ -87,6 +87,18 @@ export default function StaffScanPage() {
           />
         </div>
 
+        <div className="border-4 border-[#1a1a1a] bg-cream p-4 font-bold text-xs uppercase tracking-wider text-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a]">
+          Last scan:{' '}
+          {selected.scan_3d_data?.scanned_at
+            ? `${new Date(selected.scan_3d_data.scanned_at).toLocaleString()}${
+                selected.scan_3d_data?.scanned_by_name ? ` by ${selected.scan_3d_data.scanned_by_name}` : ''
+              }`
+            : 'Not scanned yet'}
+          <span className="ml-2 text-gray-600">
+            Source: {selected.scan_3d_data?.source || '—'}
+          </span>
+        </div>
+
         {/* QR Code for mobile scan */}
         <div className="bg-cream border-4 border-[#1a1a1a] shadow-[6px_6px_0_#1a1a1a] p-6 lg:p-8 mt-6">
           <div className="flex items-center gap-4 mb-6">
@@ -106,7 +118,7 @@ export default function StaffScanPage() {
             )}
             <div className="space-y-4">
               <p className="text-sm text-gray-500 font-bold uppercase">Or open directly on this device:</p>
-              <Link href={`/scan-intake/${selected.id}`} target="_blank" className="inline-block">
+              <Link href={`/scan-intake/${selected.id}?source=staff-qr`} target="_blank" className="inline-block">
                 <button className="flex items-center justify-center gap-3 px-6 py-4 bg-[#1a1a1a] text-electricYellow font-black uppercase tracking-widest hover:bg-electricYellow hover:text-[#1a1a1a] transition-colors border-2 border-[#1a1a1a]">
                   <Camera size={24} strokeWidth={2.5} />
                   Launch Scanner
@@ -154,6 +166,9 @@ export default function StaffScanPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-black text-[#1a1a1a] text-lg uppercase leading-tight md:text-xl truncate">{v.make} {v.model} ({v.year})</p>
                 <p className="font-mono bg-[#1a1a1a] text-electricYellow inline-block px-2 text-xs md:text-sm tracking-widest font-black mt-1 py-0.5">{v.plate}</p>
+                <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 mt-2">
+                  {v.scan_3d_data?.scanned_at ? `Last Scan: ${new Date(v.scan_3d_data.scanned_at).toLocaleString()}` : 'Last Scan: Not scanned'}
+                </p>
               </div>
               <div className="hidden md:flex items-center gap-2 text-gray-500 group-hover:text-[#1a1a1a] px-4 py-2 border-2 border-transparent group-hover:border-[#1a1a1a] transition-all bg-cream">
                 <QrCode size={20} />

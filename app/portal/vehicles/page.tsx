@@ -361,7 +361,7 @@ export default function MyVehiclesPage() {
             <div className="p-4 bg-white border-4 border-[#1a1a1a]">
               {/* Point to the new scan-intake route directly */}
               <QRCodeSVG 
-                value={`${window.location.origin}/scan-intake/${showQRForVehicle}`} 
+                value={`${window.location.origin}/scan-intake/${showQRForVehicle}?source=customer-pass`} 
                 size={220} 
                 level="M" 
                 fgColor="#1a1a1a"
