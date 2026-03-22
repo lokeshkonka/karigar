@@ -48,7 +48,7 @@ const STATUS_LIGHT: Record<string, string> = {
 // ─── Bay Vehicle Wrapper ─────────────────────────────────────────────────────────
 function BayVehicle({ bay, isSelected }: { bay: any; isSelected: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  const BAY_CAR_Z_OFFSET = 0.32;
+  const BAY_CAR_Z_OFFSET = 0.72;
 
   // Pick car body color per status for visual richness
   const carBodyColor =

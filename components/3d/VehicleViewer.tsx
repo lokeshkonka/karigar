@@ -18,7 +18,7 @@ export function VehicleViewer({ modelUrl: _modelUrl }: { modelUrl?: string }) {
       <directionalLight position={[6, 10, 6]} intensity={1.1} />
       <pointLight position={[-6, 2, -4]} intensity={0.45} />
 
-      <CarMesh autoRotate color="#5f6c79" />
+      <CarMesh autoRotate color="#5f6c79" offsetZ={0.35} />
 
       <OrbitControls makeDefault autoRotate autoRotateSpeed={0.6} minDistance={3} maxDistance={16} />
     </Canvas>

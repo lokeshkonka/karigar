@@ -11,6 +11,9 @@ export interface CarMeshProps {
   scaleZ?: number;
   wireframe?: boolean;
   autoRotate?: boolean;
+  offsetX?: number;
+  offsetY?: number;
+  offsetZ?: number;
 }
 
 const LOW_POLY_MODEL_URL = '/models/low-poly-car.fbx';
@@ -132,6 +135,9 @@ export function CarMesh({
   scaleZ = 1,
   wireframe = false,
   autoRotate = true,
+  offsetX = 0,
+  offsetY = 0,
+  offsetZ = 0,
 }: CarMeshProps) {
   const rootRef = useRef<THREE.Group>(null);
   const [loadedModel, setLoadedModel] = useState<THREE.Group | null>(null);
@@ -206,7 +212,7 @@ export function CarMesh({
   });
 
   return (
-    <group ref={rootRef} scale={[scaleX, 1, scaleZ]}>
+    <group ref={rootRef} position={[offsetX, offsetY, offsetZ]} scale={[scaleX, 1, scaleZ]}>
       {prepared && !loadFailed ? (
         <group rotation={[0, normalized.rotationY, 0]}>
           <primitive
