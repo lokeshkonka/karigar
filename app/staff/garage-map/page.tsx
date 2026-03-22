@@ -48,15 +48,15 @@ const STATUS_LIGHT: Record<string, string> = {
 // ─── Bay Vehicle Wrapper ─────────────────────────────────────────────────────────
 function BayVehicle({ bay, isSelected }: { bay: any; isSelected: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  const BAY_CAR_X_OFFSET = 1;
+  const BAY_CAR_X_OFFSET = 0.8;
   const BAY_CAR_Y_OFFSET = 0.2;
   const BAY_CAR_Z_OFFSET = 5.85;
 
-  // Pick car body color per status for visual richness
-  const carBodyColor =
+  const statusFallbackColor =
     bay.status === 'overdue'  ? '#c0392b' :
     bay.status === 'ready'    ? '#1a5fa8' :
     bay.status === 'occupied' ? '#1a1a1a' : '#555';
+  const carBodyColor = bay.carColor || statusFallbackColor;
 
   useFrame((state) => {
     if (!groupRef.current) return;
@@ -328,7 +328,7 @@ export default function GarageMapPage() {
     async function load() {
       const { data: woData } = await supabase
         .from('work_orders')
-        .select(`id, status, type, priority, plate, assigned_mechanic_id, vehicles (make, model), appointments (bay), staff_profiles (name)`)
+        .select(`id, status, type, priority, plate, assigned_mechanic_id, vehicles (make, model, color, scan_3d_data), appointments (bay), staff_profiles (name)`)
         .not('status', 'eq', 'DELIVERED');
 
       if (woData) {
@@ -338,15 +338,22 @@ export default function GarageMapPage() {
             return w.appointments?.bay === `Bay ${bay.id}`;
           });
           if (activeWo) {
-            const vMake = Array.isArray(activeWo.vehicles) ? (activeWo.vehicles as any)[0]?.make : (activeWo.vehicles as any)?.make || '';
-            const vModel = Array.isArray(activeWo.vehicles) ? (activeWo.vehicles as any)[0]?.model : (activeWo.vehicles as any)?.model || '';
+            const vehicleRow = Array.isArray(activeWo.vehicles) ? (activeWo.vehicles as any)[0] : (activeWo.vehicles as any);
+            const vMake = vehicleRow?.make || '';
+            const vModel = vehicleRow?.model || '';
             const tName = Array.isArray(activeWo.staff_profiles) ? (activeWo.staff_profiles as any)[0]?.name : (activeWo.staff_profiles as any)?.name || 'Unassigned';
             let bStatus = 'occupied';
             if (activeWo.status === 'READY') bStatus = 'ready';
             if (activeWo.priority === 'urgent' || activeWo.priority === 'critical') bStatus = 'overdue';
-            return { ...bay, status: bStatus, vehicle: activeWo.plate, makeModel: `${vMake} ${vModel}`.trim() || 'Vehicle', type: activeWo.type, mechanic: tName, time: activeWo.status };
+            const scannedColor = vehicleRow?.scan_3d_data?.color;
+            const statusFallbackColor =
+              bStatus === 'overdue' ? '#c0392b' :
+              bStatus === 'ready' ? '#1a5fa8' :
+              bStatus === 'occupied' ? '#1a1a1a' : '#555';
+            const carColor = vehicleRow?.color || scannedColor || statusFallbackColor;
+            return { ...bay, status: bStatus, vehicle: activeWo.plate, makeModel: `${vMake} ${vModel}`.trim() || 'Vehicle', type: activeWo.type, mechanic: tName, time: activeWo.status, carColor };
           }
-          return { ...bay, status: 'empty', vehicle: '', makeModel: '', type: '', mechanic: '', time: '' };
+          return { ...bay, status: 'empty', vehicle: '', makeModel: '', type: '', mechanic: '', time: '', carColor: '' };
         }));
       }
     }
