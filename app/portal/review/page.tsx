@@ -1,15 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/Card';
+import { Loader } from '@/components/ui/Loader';
 import { Star, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/useAuthStore';
 
-const MECHANICS = [
-  { id: 'TECH-001', name: 'Marcus Vance', role: 'Head Mechanic' },
-  { id: 'TECH-002', name: 'Sarah Jenkins', role: 'Diagnostic Specialist' },
-];
+interface ExistingReview {
+  id: string;
+  overall_rating: number | null;
+  mechanic_rating: number | null;
+  comment: string | null;
+}
+
+interface MechanicProfile {
+  id: string;
+  name: string;
+  role: string | null;
+}
+
+interface ReviewableWorkOrder {
+  id: string;
+  type: string;
+  plate: string | null;
+  created_at: string;
+  assigned_mechanic_id: string | null;
+  mechanic: MechanicProfile | null;
+  existingReview: ExistingReview | null;
+}
 
 function StarRating({ rating, onRate }: { rating: number; onRate: (n: number) => void }) {
   const [hover, setHover] = useState(0);
@@ -35,21 +56,193 @@ function StarRating({ rating, onRate }: { rating: number; onRate: (n: number) =>
 }
 
 export default function ReviewPage() {
+  const { user, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [customerName, setCustomerName] = useState('Customer');
+  const [workOrders, setWorkOrders] = useState<ReviewableWorkOrder[]>([]);
+  const [selectedWorkOrderId, setSelectedWorkOrderId] = useState('');
   const [overallRating, setOverallRating] = useState(0);
-  const [mechanicRatings, setMechanicRatings] = useState<Record<string, number>>({});
+  const [mechanicRating, setMechanicRating] = useState(0);
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    async function loadReviewContext() {
+      if (authLoading) return;
+
+      setLoading(true);
+
+      if (!user?.email) {
+        setWorkOrders([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('id, name')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (!customer) {
+        setLoading(false);
+        return;
+      }
+
+      setCustomerName(customer.name || user.name || 'Customer');
+
+      const { data: orders } = await supabase
+        .from('work_orders')
+        .select('id, type, plate, created_at, assigned_mechanic_id, status')
+        .eq('customer_id', customer.id)
+        .in('status', ['READY', 'DELIVERED'])
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (!orders || orders.length === 0) {
+        setWorkOrders([]);
+        setLoading(false);
+        return;
+      }
+
+      const workOrderIds = orders.map((order) => order.id);
+      const mechanicIds = [...new Set(orders.map((order) => order.assigned_mechanic_id).filter(Boolean))] as string[];
+
+      const [{ data: reviewRows }, { data: mechanicRows }] = await Promise.all([
+        supabase
+          .from('reviews')
+          .select('id, work_order_id, overall_rating, mechanic_rating, comment')
+          .in('work_order_id', workOrderIds),
+        mechanicIds.length > 0
+          ? supabase.from('staff_profiles').select('id, name, role').in('id', mechanicIds)
+          : Promise.resolve({ data: [] as MechanicProfile[] }),
+      ]);
+
+      const reviewByWorkOrder = new Map<string, ExistingReview>();
+      (reviewRows || []).forEach((review) => {
+        if (review.work_order_id && !reviewByWorkOrder.has(review.work_order_id)) {
+          reviewByWorkOrder.set(review.work_order_id, {
+            id: review.id,
+            overall_rating: review.overall_rating,
+            mechanic_rating: review.mechanic_rating,
+            comment: review.comment,
+          });
+        }
+      });
+
+      const mechanicById = new Map<string, MechanicProfile>();
+      (mechanicRows || []).forEach((mechanic) => {
+        mechanicById.set(mechanic.id, mechanic);
+      });
+
+      const mappedOrders: ReviewableWorkOrder[] = orders.map((order) => ({
+        id: order.id,
+        type: order.type,
+        plate: order.plate,
+        created_at: order.created_at,
+        assigned_mechanic_id: order.assigned_mechanic_id,
+        mechanic: order.assigned_mechanic_id ? mechanicById.get(order.assigned_mechanic_id) || null : null,
+        existingReview: reviewByWorkOrder.get(order.id) || null,
+      }));
+
+      setWorkOrders(mappedOrders);
+
+      const firstPending = mappedOrders.find((order) => !order.existingReview);
+      setSelectedWorkOrderId((firstPending || mappedOrders[0]).id);
+      setLoading(false);
+    }
+
+    loadReviewContext();
+  }, [user, authLoading]);
+
+  const selectedOrder = useMemo(
+    () => workOrders.find((order) => order.id === selectedWorkOrderId) || null,
+    [workOrders, selectedWorkOrderId]
+  );
+
+  useEffect(() => {
+    if (!selectedOrder) return;
+    if (selectedOrder.existingReview) {
+      setOverallRating(selectedOrder.existingReview.overall_rating || 0);
+      setMechanicRating(selectedOrder.existingReview.mechanic_rating || 0);
+      setComment(selectedOrder.existingReview.comment || '');
+      return;
+    }
+
+    setOverallRating(0);
+    setMechanicRating(0);
+    setComment('');
+  }, [selectedOrder]);
+
+  const handleSubmit = async () => {
+    if (!selectedOrder) {
+      toast.error('No service available to review yet');
+      return;
+    }
+
     if (overallRating === 0) {
       toast.error('Please rate your overall experience');
       return;
     }
+
+    if (selectedOrder.assigned_mechanic_id && mechanicRating === 0) {
+      toast.error('Please rate your technician');
+      return;
+    }
+
+    setSubmitting(true);
+
+    const payload = {
+      work_order_id: selectedOrder.id,
+      customer_name: customerName,
+      mechanic_id: selectedOrder.assigned_mechanic_id,
+      overall_rating: overallRating,
+      mechanic_rating: selectedOrder.assigned_mechanic_id ? mechanicRating : null,
+      comment: comment.trim() ? comment.trim() : null,
+    };
+
+    let dbError: { message?: string } | null = null;
+
+    if (selectedOrder.existingReview?.id) {
+      const { error } = await supabase
+        .from('reviews')
+        .update(payload)
+        .eq('id', selectedOrder.existingReview.id);
+      dbError = error;
+    } else {
+      const { error } = await supabase.from('reviews').insert(payload);
+      dbError = error;
+    }
+
+    if (dbError) {
+      toast.error(dbError.message || 'Unable to submit review');
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitted(true);
-    toast.success('Thank you for your feedback! 🌟', { duration: 4000 });
+    toast.success('Thank you for your feedback! 🌟', { duration: 3500 });
     setTimeout(() => router.push('/portal/home'), 2500);
   };
+
+  if (loading || authLoading) return <Loader />;
+
+  if (workOrders.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="border-b-4 border-[#1a1a1a] pb-4">
+          <h1 className="text-3xl font-black uppercase tracking-widest">Rate Your Visit</h1>
+          <p className="text-sm font-bold text-gray-500">Reviews unlock after a READY or DELIVERED job</p>
+        </div>
+        <Card className="border-4 border-dashed border-gray-400 text-center py-10">
+          <p className="font-black uppercase tracking-widest text-[#1a1a1a]">No completed services yet</p>
+          <p className="text-sm font-bold text-gray-500 mt-2">Once your service is completed, you can submit a review here.</p>
+        </Card>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -73,7 +266,22 @@ export default function ReviewPage() {
     <div className="space-y-8 animate-in fade-in">
       <div className="border-b-4 border-[#1a1a1a] pb-4">
         <h1 className="text-3xl font-black uppercase tracking-widest">Rate Your Visit</h1>
-        <p className="text-sm font-bold text-gray-500">Service #INV-001 · MH 12 AB 1234</p>
+        <p className="text-sm font-bold text-gray-500">Your feedback is visible to technicians and admins</p>
+      </div>
+
+      <div>
+        <label className="block font-black uppercase text-sm tracking-widest mb-2">Select Service</label>
+        <select
+          value={selectedWorkOrderId}
+          onChange={(e) => setSelectedWorkOrderId(e.target.value)}
+          className="w-full p-3 bg-white border-2 border-[#1a1a1a] font-bold focus:outline-none focus:ring-2 focus:ring-electricYellow"
+        >
+          {workOrders.map((order) => (
+            <option key={order.id} value={order.id}>
+              {order.plate || 'Unknown Plate'} · {order.type} · {new Date(order.created_at).toLocaleDateString()} {order.existingReview ? '(editing review)' : '(new)'}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Overall Rating */}
@@ -91,28 +299,25 @@ export default function ReviewPage() {
       </Card>
 
       {/* Mechanic Ratings */}
-      <section className="space-y-4">
-        <h2 className="font-black text-sm uppercase tracking-widest text-[#1a1a1a] border-b-2 border-dashed border-gray-300 pb-2">
-          Rate Your Mechanics
-        </h2>
-        {MECHANICS.map(mech => (
-          <Card key={mech.id} className="flex items-center gap-4">
+      {selectedOrder?.mechanic && (
+        <section className="space-y-4">
+          <h2 className="font-black text-sm uppercase tracking-widest text-[#1a1a1a] border-b-2 border-dashed border-gray-300 pb-2">
+            Rate Your Technician
+          </h2>
+          <Card className="flex items-center gap-4">
             <div className="w-12 h-12 bg-cream border-2 border-[#1a1a1a] shrink-0 flex items-center justify-center font-black text-xl">
-              {mech.name[0]}
+              {selectedOrder.mechanic.name[0]}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-black uppercase leading-none">{mech.name}</h3>
-              <p className="text-xs text-gray-500 font-bold">{mech.role}</p>
+              <h3 className="font-black uppercase leading-none">{selectedOrder.mechanic.name}</h3>
+              <p className="text-xs text-gray-500 font-bold">{selectedOrder.mechanic.role || 'Technician'}</p>
               <div className="mt-2">
-                <StarRating
-                  rating={mechanicRatings[mech.id] || 0}
-                  onRate={(n) => setMechanicRatings(prev => ({ ...prev, [mech.id]: n }))}
-                />
+                <StarRating rating={mechanicRating} onRate={setMechanicRating} />
               </div>
             </div>
           </Card>
-        ))}
-      </section>
+        </section>
+      )}
 
       {/* Comment */}
       <div>
@@ -130,9 +335,10 @@ export default function ReviewPage() {
       {/* Submit */}
       <button
         onClick={handleSubmit}
+        disabled={submitting}
         className="w-full py-5 bg-electricYellow border-2 border-[#1a1a1a] shadow-[4px_4px_0px_#1a1a1a] font-black uppercase text-lg tracking-wider flex items-center justify-center gap-3 hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
       >
-        <Send size={22} strokeWidth={2.5} /> Submit Review
+        <Send size={22} strokeWidth={2.5} /> {submitting ? 'Submitting...' : 'Submit Review'}
       </button>
     </div>
   );

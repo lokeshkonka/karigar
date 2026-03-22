@@ -27,6 +27,7 @@ const ADMIN_ITEMS = [
   { icon: CalendarDays,    label: 'Scheduling',   href: '/admin/schedule' },
   { icon: Map,             label: 'Garage Map',   href: '/admin/garage-map' },
   { icon: BarChart,        label: 'Reports',      href: '/admin/reports' },
+  { icon: Star,            label: 'Reviews',      href: '/admin/reviews' },
   { icon: UserSquare2,     label: 'Staff',        href: '/admin/staff' },
   { icon: Settings,        label: 'Settings',     href: '/admin/settings' },
 ];
@@ -233,4 +234,3 @@ export function CollapsibleSidebar({ variant }: CollapsibleSidebarProps) {
     </aside>
   );
 }
-

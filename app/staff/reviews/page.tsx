@@ -4,14 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { Loader } from '@/components/ui/Loader';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Star, Loader2, MessageSquare } from 'lucide-react';
+import { Star, MessageSquare } from 'lucide-react';
 
 interface Review {
   id: string;
   customer_name: string;
   overall_rating: number;
-  mechanic_rating: number;
-  comment: string;
+  mechanic_rating: number | null;
+  comment: string | null;
   created_at: string;
 }
 
@@ -57,7 +57,10 @@ export default function StaffReviewsPage() {
   }, [user]);
 
   const displayReviews = reviews;
-  const avgMechanic = displayReviews.length > 0 ? displayReviews.reduce((s, r) => s + r.mechanic_rating, 0) / displayReviews.length : 0;
+  const mechanicScores = displayReviews
+    .map((review) => review.mechanic_rating ?? review.overall_rating)
+    .filter((rating): rating is number => typeof rating === 'number' && rating > 0);
+  const avgMechanic = mechanicScores.length > 0 ? mechanicScores.reduce((sum, rating) => sum + rating, 0) / mechanicScores.length : 0;
 
   return (
     <div className="space-y-6 animate-in fade-in pb-12">
@@ -98,7 +101,7 @@ export default function StaffReviewsPage() {
                   </div>
                   <div className="text-right flex flex-col items-end">
                     <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Your Rating</p>
-                    <Stars rating={r.mechanic_rating} />
+                    <Stars rating={r.mechanic_rating ?? r.overall_rating} />
                   </div>
                 </div>
                 
