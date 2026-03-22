@@ -48,7 +48,9 @@ const STATUS_LIGHT: Record<string, string> = {
 // ─── Bay Vehicle Wrapper ─────────────────────────────────────────────────────────
 function BayVehicle({ bay, isSelected }: { bay: any; isSelected: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  const BAY_CAR_Z_OFFSET = 6.00;
+  const BAY_CAR_X_OFFSET = 1.3;
+  const BAY_CAR_Y_OFFSET = 1.2;
+  const BAY_CAR_Z_OFFSET = 5.85;
 
   // Pick car body color per status for visual richness
   const carBodyColor =
@@ -59,14 +61,14 @@ function BayVehicle({ bay, isSelected }: { bay: any; isSelected: boolean }) {
   useFrame((state) => {
     if (!groupRef.current) return;
     if (isSelected) {
-      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.4) * 0.035;
+      groupRef.current.position.y = BAY_CAR_Y_OFFSET + Math.sin(state.clock.elapsedTime * 1.4) * 0.035;
     } else {
-      groupRef.current.position.y = 0;
+      groupRef.current.position.y = BAY_CAR_Y_OFFSET;
     }
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.05, BAY_CAR_Z_OFFSET]}>
+    <group ref={groupRef} position={[BAY_CAR_X_OFFSET, BAY_CAR_Y_OFFSET, BAY_CAR_Z_OFFSET]}>
       <CarMesh color={carBodyColor} scaleX={0.9} scaleZ={0.9} autoRotate={false} />
 
       {/* ── Headlight cones ── */}
