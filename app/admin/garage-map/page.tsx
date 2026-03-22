@@ -11,8 +11,8 @@ import * as THREE from 'three';
 import { supabase } from '@/lib/supabase';
 import { MapPin, User, Wrench, AlertTriangle, CheckCircle2, Clock, X, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import type { CarMeshProps } from '@/components/3d/VehicleModelViewer';
-const CarMesh = dynamic<CarMeshProps>(() => import('@/components/3d/VehicleModelViewer').then(m => m.CarMesh), { ssr: false });
+import type { CarMeshProps } from '@/components/3d/CarMesh';
+const CarMesh = dynamic<CarMeshProps>(() => import('@/components/3d/CarMesh').then(m => m.CarMesh), { ssr: false });
 
 // ─── Bay layout: 2 rows of 3 ──────────────────────────────────────────────
 const INITIAL_BAYS = [

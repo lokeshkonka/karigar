@@ -8,6 +8,7 @@ import {
   Sparkles,
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { CarMesh as PremiumCarMesh } from '@/components/3d/CarMesh';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // WHEEL  –  correct anatomy:
@@ -744,7 +745,7 @@ export function VehicleModelViewer({
 
           <Environment preset="studio" />
 
-          <CarMesh color={color} scaleX={scaleX} scaleZ={scaleZ} autoRotate={autoRotate} />
+          <PremiumCarMesh color={color} scaleX={scaleX} scaleZ={scaleZ} autoRotate={autoRotate} />
 
           <StudioFloor />
 
