@@ -48,7 +48,7 @@ const STATUS_LIGHT: Record<string, string> = {
 // ─── Bay Vehicle Wrapper ─────────────────────────────────────────────────────────
 function BayVehicle({ bay, isSelected }: { bay: any; isSelected: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  const BAY_CAR_X_OFFSET = -0.8;
+  const BAY_CAR_X_OFFSET = 1;
   const BAY_CAR_Y_OFFSET = 0.2;
   const BAY_CAR_Z_OFFSET = 5.85;
 
