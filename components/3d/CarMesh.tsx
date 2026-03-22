@@ -13,7 +13,7 @@ export interface CarMeshProps {
   autoRotate?: boolean;
 }
 
-const CAMARO_MODEL_URL = '/models/chevrolet-camaro.fbx';
+const LOW_POLY_MODEL_URL = '/models/low-poly-car.fbx';
 
 let modelCache: THREE.Group | null = null;
 let modelLoadPromise: Promise<THREE.Group> | null = null;
@@ -26,14 +26,14 @@ function safeColor(input: string, fallback = '#7f8791') {
   }
 }
 
-function loadCamaroModel() {
+function loadLowPolyModel() {
   if (modelCache) return Promise.resolve(modelCache);
   if (modelLoadPromise) return modelLoadPromise;
 
   modelLoadPromise = new Promise<THREE.Group>((resolve, reject) => {
     const loader = new FBXLoader();
     loader.load(
-      CAMARO_MODEL_URL,
+      LOW_POLY_MODEL_URL,
       (group) => {
         modelCache = group;
         resolve(group);
@@ -139,7 +139,7 @@ export function CarMesh({
 
   useEffect(() => {
     let cancelled = false;
-    loadCamaroModel()
+    loadLowPolyModel()
       .then((model) => {
         if (cancelled) return;
         setLoadedModel(model.clone(true));
@@ -189,7 +189,7 @@ export function CarMesh({
     const lengthAxisIsX = size.x > size.z;
     const rotationY = lengthAxisIsX ? Math.PI / 2 : 0;
     const modelLength = lengthAxisIsX ? size.x : size.z;
-    const targetLength = 4.65;
+    const targetLength = 4.25;
     const uniformScale = modelLength > 0 ? targetLength / modelLength : 1;
 
     return {

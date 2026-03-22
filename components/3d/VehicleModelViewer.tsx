@@ -3,8 +3,8 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
 import { CarMesh } from '@/components/3d/CarMesh';
+import { createOptimizedRenderer } from '@/components/3d/createOptimizedRenderer';
 
 interface VehicleModelViewerProps {
   color?: string;
@@ -31,12 +31,7 @@ export function VehicleModelViewer({
         shadows={false}
         dpr={1}
         camera={{ position: [6, 2.3, 7.2], fov: 38 }}
-        gl={{
-          antialias: false,
-          alpha: true,
-          powerPreference: 'high-performance',
-          toneMapping: THREE.NoToneMapping,
-        }}
+        gl={createOptimizedRenderer}
         frameloop={autoRotate ? 'always' : 'demand'}
       >
         <ambientLight intensity={0.85} />
