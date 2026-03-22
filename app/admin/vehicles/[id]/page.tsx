@@ -112,15 +112,12 @@ export default function VehicleDetailPage() {
     fetchVehicle();
   }, [id]);
 
-  if (loading) return <Loader fullScreen />;
-  if (!vehicle) return <div className="p-12 text-center font-black uppercase text-gray-500">Vehicle not found</div>;
-
-  const v = vehicle;
-
-  const carColor = v.color || '#888888';
+  const carColor = vehicle?.color || '#888888';
 
   const scanHistory = useMemo(() => {
-    const scanData = (v.scan_3d_data || {}) as any;
+    if (!vehicle) return [];
+
+    const scanData = (vehicle.scan_3d_data || {}) as any;
     const list = Array.isArray(scanData.history) ? [...scanData.history] : [];
 
     if (scanData.scanned_at && !list.some((entry) => entry?.scanned_at === scanData.scanned_at)) {
@@ -129,7 +126,7 @@ export default function VehicleDetailPage() {
         scanned_by_name: scanData.scanned_by_name || null,
         scanned_by_role: scanData.scanned_by_role || null,
         source: scanData.source || 'direct',
-        color: v.color || '#888888',
+        color: vehicle.color || '#888888',
         scaleX: scanData.scaleX,
         scaleZ: scanData.scaleZ,
       });
@@ -138,7 +135,7 @@ export default function VehicleDetailPage() {
     return list
       .filter((entry) => entry?.scanned_at)
       .sort((a, b) => new Date(b.scanned_at).getTime() - new Date(a.scanned_at).getTime());
-  }, [v.scan_3d_data, v.color]);
+  }, [vehicle]);
 
   const timelineItems = useMemo(() => {
     const entries: Array<{
@@ -197,13 +194,13 @@ export default function VehicleDetailPage() {
         ts: scan.scanned_at,
         kind: 'scan',
         title: 'QR / Camera Scan Completed',
-        subtitle: `Color: ${(scan.color || v.color || '#888888').toUpperCase()} · Source: ${scan.source || 'direct'}`,
+        subtitle: `Color: ${(scan.color || vehicle?.color || '#888888').toUpperCase()} · Source: ${scan.source || 'direct'}`,
         meta: `${scan.scanned_by_name || 'Unknown'}${scan.scanned_by_role ? ` (${scan.scanned_by_role})` : ''}`,
       });
     });
 
     return entries.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
-  }, [appointments, invoices, scanHistory, v.color, workOrders]);
+  }, [appointments, invoices, scanHistory, vehicle?.color, workOrders]);
 
   const updateFuel = async () => {
     if (!vehicle) return;
@@ -217,6 +214,11 @@ export default function VehicleDetailPage() {
     setVehicle((prev) => (prev ? { ...prev, fuel: fuelDraft } : prev));
     toast.success('Fuel type updated');
   };
+
+  if (loading) return <Loader fullScreen />;
+  if (!vehicle) return <div className="p-12 text-center font-black uppercase text-gray-500">Vehicle not found</div>;
+
+  const v = vehicle;
 
   return (
     <div className="space-y-6 animate-in fade-in h-[calc(100vh-200px)] flex flex-col">
