@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 
 export default function StaffDashboardPage() {
   const { user } = useAuthStore();
+  const isTechnicianReadOnly = user?.role === 'TECHNICIAN';
   const [profileId, setProfileId] = useState<string | null>(null);
   const [activeJob, setActiveJob] = useState<any>(null);
   const [waitingJobs, setWaitingJobs] = useState<any[]>([]);
@@ -88,6 +89,10 @@ export default function StaffDashboardPage() {
   }
 
   const handleStartJob = async (jobId: string) => {
+    if (isTechnicianReadOnly) {
+      toast.error('Technician accounts are view-only for work order updates.');
+      return;
+    }
     if (activeJob) { toast.error('You already have an active job!'); return; }
     await supabase.from('work_orders').update({
       status: 'INPROGRESS',
@@ -98,12 +103,20 @@ export default function StaffDashboardPage() {
   };
 
   const openInvoiceModal = () => {
+    if (isTechnicianReadOnly) {
+      toast.error('Technician accounts are view-only for work order updates.');
+      return;
+    }
     if (!activeJob) return;
     setInvoiceAmount('');
     setShowInvoiceModal(true);
   };
 
   const handleCompleteJob = async () => {
+    if (isTechnicianReadOnly) {
+      toast.error('Technician accounts are view-only for work order updates.');
+      return;
+    }
     if (!activeJob || invoiceAmount === '') {
       toast.error('Please enter a valid amount');
       return;
@@ -130,6 +143,10 @@ export default function StaffDashboardPage() {
   };
 
   const submitPartsRequest = async () => {
+    if (isTechnicianReadOnly) {
+      toast.error('Technician accounts are view-only for work order updates.');
+      return;
+    }
     if (!partForm.name) { toast.error('Part name required'); return; }
     await supabase.from('parts_tickets').insert({
       work_order_id: activeJob.id,
@@ -144,6 +161,10 @@ export default function StaffDashboardPage() {
   };
 
   const updateBay = async () => {
+    if (isTechnicianReadOnly) {
+      toast.error('Technician accounts are view-only for work order updates.');
+      return;
+    }
     if (!activeJob || !bayForm) return;
     
     // Check if appointment exists for this WO
@@ -188,6 +209,11 @@ export default function StaffDashboardPage() {
         {/* Active Job Dashboard */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-3xl font-black uppercase tracking-widest text-[#1a1a1a] border-b-4 border-[#1a1a1a] inline-block pb-1">Active Job</h2>
+          {isTechnicianReadOnly && (
+            <div className="bg-cream border-2 border-dashed border-[#1a1a1a] px-4 py-2 font-black text-xs uppercase tracking-widest text-gray-700 inline-block">
+              View-only mode for technician role
+            </div>
+          )}
           
           {!activeJob ? (
             <Card className="bg-white border-4 border-[#1a1a1a] shadow-[6px_6px_0_#1a1a1a] p-12 text-center text-gray-400 font-black uppercase tracking-widest">
@@ -211,7 +237,8 @@ export default function StaffDashboardPage() {
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-3xl font-black uppercase leading-tight">{activeJob.type}</h3>
                 <button 
-                  onClick={() => setShowBayModal(true)}
+                  onClick={() => !isTechnicianReadOnly && setShowBayModal(true)}
+                  disabled={isTechnicianReadOnly}
                   className="flex items-center gap-2 bg-cream border-2 border-[#1a1a1a] px-3 py-1 font-black text-sm uppercase shadow-[2px_2px_0_#1a1a1a] hover:bg-electricYellow transition-colors"
                 >
                   <MapPin size={16} /> {activeJob.bay}
@@ -228,7 +255,7 @@ export default function StaffDashboardPage() {
                 <Button onClick={openInvoiceModal} className="flex-1 py-5 text-[15px] font-black tracking-widest uppercase flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] border-2 border-[#1a1a1a]">
                   <CheckCircle size={22} /> MARK READY & SEND INVOICE
                 </Button>
-                <Button onClick={() => setShowPartsModal(true)} variant="outline" className="flex-1 py-5 text-[15px] font-black tracking-widest uppercase flex items-center justify-center gap-3 bg-white hover:bg-cream shadow-[4px_4px_0_#1a1a1a] border-4 border-[#1a1a1a] text-[#1a1a1a]">
+                <Button onClick={() => !isTechnicianReadOnly && setShowPartsModal(true)} disabled={isTechnicianReadOnly} variant="outline" className="flex-1 py-5 text-[15px] font-black tracking-widest uppercase flex items-center justify-center gap-3 bg-white hover:bg-cream shadow-[4px_4px_0_#1a1a1a] border-4 border-[#1a1a1a] text-[#1a1a1a]">
                   <PackagePlus size={22} /> REQUEST PARTS
                 </Button>
               </div>
@@ -280,8 +307,8 @@ export default function StaffDashboardPage() {
                 <h4 className="text-[#1a1a1a] font-black uppercase text-xl leading-none">{job.type}</h4>
                 <p className="text-sm font-bold text-gray-500 uppercase mt-1 line-clamp-1">{job.issue_description}</p>
               </div>
-              <Button onClick={() => handleStartJob(job.id)} disabled={!!activeJob} className="shrink-0 bg-[#1a1a1a] text-white hover:bg-electricYellow hover:text-[#1a1a1a] border-2 border-[#1a1a1a] font-black uppercase tracking-wider py-6 px-8">
-                <Play size={18} className="mr-2" /> Start Repair
+              <Button onClick={() => handleStartJob(job.id)} disabled={!!activeJob || isTechnicianReadOnly} className="shrink-0 bg-[#1a1a1a] text-white hover:bg-electricYellow hover:text-[#1a1a1a] border-2 border-[#1a1a1a] font-black uppercase tracking-wider py-6 px-8">
+                <Play size={18} className="mr-2" /> {isTechnicianReadOnly ? 'View Only' : 'Start Repair'}
               </Button>
             </Card>
           )

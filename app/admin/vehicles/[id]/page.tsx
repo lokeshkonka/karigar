@@ -15,6 +15,7 @@ const VehicleModelViewer = dynamic(
 );
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase';
+import toast from 'react-hot-toast';
 
 interface Vehicle {
   id: string;
@@ -34,6 +35,8 @@ export default function VehicleDetailPage() {
   const [scanUrl, setScanUrl] = useState('');
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fuelDraft, setFuelDraft] = useState('Petrol');
+  const [savingFuel, setSavingFuel] = useState(false);
 
   useEffect(() => {
     setScanUrl(`${window.location.origin}/scan-intake/${id}`);
@@ -44,6 +47,7 @@ export default function VehicleDetailPage() {
         .eq('id', id as string)
         .maybeSingle();
       setVehicle(data);
+      if (data?.fuel) setFuelDraft(data.fuel);
       setLoading(false);
     }
     fetchVehicle();
@@ -55,6 +59,19 @@ export default function VehicleDetailPage() {
   const v = vehicle;
 
   const carColor = v.color || '#888888';
+
+  const updateFuel = async () => {
+    if (!vehicle) return;
+    setSavingFuel(true);
+    const { error } = await supabase.from('vehicles').update({ fuel: fuelDraft }).eq('id', vehicle.id);
+    setSavingFuel(false);
+    if (error) {
+      toast.error('Failed to update fuel type');
+      return;
+    }
+    setVehicle((prev) => (prev ? { ...prev, fuel: fuelDraft } : prev));
+    toast.success('Fuel type updated');
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in h-[calc(100vh-200px)] flex flex-col">
@@ -150,6 +167,23 @@ export default function VehicleDetailPage() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="border-t-2 border-dashed border-gray-300 pt-6">
+              <h3 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-2">Edit Fuel Type</h3>
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <select
+                  value={fuelDraft}
+                  onChange={(e) => setFuelDraft(e.target.value)}
+                  className="border-2 border-[#1a1a1a] p-3 font-black bg-white focus:outline-none focus:ring-2 focus:ring-electricYellow"
+                >
+                  {['Petrol', 'Diesel', 'CNG', 'EV', 'Hybrid'].map((fuel) => (
+                    <option key={fuel} value={fuel}>{fuel}</option>
+                  ))}
+                </select>
+                <Button onClick={updateFuel} disabled={savingFuel} className="sm:w-auto">
+                  {savingFuel ? 'Saving...' : 'Save Fuel Type'}
+                </Button>
+              </div>
             </div>
           </div>
         )}

@@ -4,11 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList
 } from 'recharts';
-import { TrendingUp, Clock, AlertTriangle, PenSquare } from 'lucide-react';
+import { TrendingUp, Clock, AlertTriangle } from 'lucide-react';
 
 // Dynamic Dashboard Stats, Charts, and Jobs
 
@@ -21,37 +21,43 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchDashboard() {
-      const { data, error } = await supabase
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const { data: activeData, error } = await supabase
         .from('work_orders')
         .select(`
-          id, status, type, created_at,
+          id, status, type, created_at, updated_at,
           vehicles ( plate ),
           customers ( name )
         `)
         .neq('status', 'DELIVERED')
-        .order('created_at', { ascending: false })
-        .limit(10);
-        
-      if (!error && data) {
-        const mapped = data.map((job: any) => ({
+        .order('updated_at', { ascending: false })
+        .limit(12);
+
+      if (!error && activeData) {
+        const mapped = activeData.map((job: any) => ({
           id: `JOB-${job.id.substring(0,6)}`,
-          plate: job.vehicles?.plate || job.plate || 'Unknown',
-          customer: job.customers?.name || job.customer_name || 'Walk-In',
+          plate: (Array.isArray(job.vehicles) ? job.vehicles[0]?.plate : job.vehicles?.plate) || 'Unknown',
+          customer: (Array.isArray(job.customers) ? job.customers[0]?.name : job.customers?.name) || 'Walk-In',
           type: job.type || 'Service',
           status: job.status.toLowerCase(),
-          time: new Date(job.created_at).toLocaleDateString()
+          time: new Date(job.updated_at || job.created_at).toLocaleString()
         }));
         setActiveJobs(mapped);
       }
 
-      // Fetch analytics
+      // Fetch analytics sources
       const [invRes, allJobsRes] = await Promise.all([
-        supabase.from('invoices').select('amount, status'),
+        supabase.from('invoices').select('amount, status, created_at'),
         supabase.from('work_orders').select('type, created_at')
       ]);
 
       if (allJobsRes.data) {
-        setStats(s => ({ ...s, jobsMonth: allJobsRes.data.length }));
+        const jobsThisMonth = allJobsRes.data.filter((job: any) => new Date(job.created_at) >= monthStart).length;
+        setStats(s => ({ ...s, jobsMonth: jobsThisMonth }));
+
         const typeCounts = allJobsRes.data.reduce((acc: any, job: any) => {
           acc[job.type] = (acc[job.type] || 0) + 1;
           return acc;
@@ -61,32 +67,63 @@ export default function DashboardPage() {
       }
 
       if (invRes.data) {
-        let totalRev = 0;
+        let todayRevenue = 0;
         let pending = 0;
         let overdue = 0;
+        const dailyRevenueMap = new Map<string, number>();
+
+        // Initialize last 7 days for stable chart axis.
+        for (let offset = 6; offset >= 0; offset -= 1) {
+          const d = new Date(now);
+          d.setDate(now.getDate() - offset);
+          const key = d.toISOString().slice(0, 10);
+          dailyRevenueMap.set(key, 0);
+        }
+
         invRes.data.forEach((inv: any) => {
-          if (inv.status === 'paid') totalRev += Number(inv.amount);
+          const amount = Number(inv.amount) || 0;
+          const createdAt = inv.created_at ? new Date(inv.created_at) : null;
+
+          if (inv.status === 'paid') {
+            if (createdAt && createdAt >= todayStart) todayRevenue += amount;
+            if (createdAt) {
+              const key = createdAt.toISOString().slice(0, 10);
+              if (dailyRevenueMap.has(key)) {
+                dailyRevenueMap.set(key, (dailyRevenueMap.get(key) || 0) + amount);
+              }
+            }
+          }
           if (inv.status === 'pending') pending += Number(inv.amount);
           if (inv.status === 'overdue') { pending += Number(inv.amount); overdue++; }
         });
-        setStats(s => ({ ...s, todayRev: totalRev, pendingInvoices: pending, overdue }));
-        
-        // Mock weekly chart shape but scale the revenue to demo
-        setRevChart([
-          { name: 'Mon', revenue: Math.floor(totalRev * 0.2) },
-          { name: 'Tue', revenue: Math.floor(totalRev * 0.4) },
-          { name: 'Wed', revenue: Math.floor(totalRev * 0.3) },
-          { name: 'Thu', revenue: Math.floor(totalRev * 0.6) },
-          { name: 'Fri', revenue: Math.floor(totalRev * 0.8) },
-          { name: 'Sat', revenue: Math.floor(totalRev * 1.5) },
-          { name: 'Sun', revenue: totalRev }
-        ]);
+        setStats(s => ({ ...s, todayRev: todayRevenue, pendingInvoices: pending, overdue }));
+
+        const chartRows = Array.from(dailyRevenueMap.entries()).map(([key, revenue]) => {
+          const date = new Date(`${key}T00:00:00`);
+          return {
+            name: date.toLocaleDateString('en-US', { weekday: 'short' }),
+            revenue: Math.round(revenue),
+          };
+        });
+        setRevChart(chartRows);
       }
 
       setLoading(false);
     }
-    
+
     fetchDashboard();
+
+    const refreshTimer = setInterval(fetchDashboard, 45000);
+    const channel = supabase
+      .channel('admin-dashboard-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'work_orders' }, () => fetchDashboard())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, () => fetchDashboard())
+      .subscribe();
+
+    return () => {
+      clearInterval(refreshTimer);
+      supabase.removeChannel(channel);
+    };
   }, []);
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -95,12 +132,10 @@ export default function DashboardPage() {
           <h1 className="text-4xl font-black uppercase tracking-widest text-[#1a1a1a]">
             Operations Overview
           </h1>
-          <p className="font-bold text-gray-600 mt-2 tracking-wider">TUESDAY, 24 OCT 2024</p>
+          <p className="font-bold text-gray-600 mt-2 tracking-wider">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' })}
+          </p>
         </div>
-        <Button className="flex items-center gap-2">
-          <PenSquare size={18} strokeWidth={3} />
-          New Work Order
-        </Button>
       </div>
 
       {/* KPI Row */}
@@ -228,7 +263,9 @@ export default function DashboardPage() {
           <h3 className="font-black uppercase text-xl border-b-4 border-electricYellow pb-1 inline-block">
             Active Work Orders
           </h3>
-          <Button variant="outline" className="py-2 text-xs">View All</Button>
+          <Link href="/admin/jobs" className="py-2 px-3 text-xs font-black uppercase border-2 border-[#1a1a1a] bg-white hover:bg-cream">
+            View All
+          </Link>
         </div>
         
         <div className="overflow-x-auto">
@@ -264,7 +301,12 @@ export default function DashboardPage() {
                     <Badge variant={job.status as any}>{job.status}</Badge>
                   </td>
                   <td className="p-4">
-                    <Button variant="outline" className="px-3 py-1 text-xs">View</Button>
+                    <Link
+                      href="/admin/jobs"
+                      className="px-3 py-1 text-xs font-black uppercase border-2 border-[#1a1a1a] bg-white hover:bg-cream"
+                    >
+                      Open
+                    </Link>
                   </td>
                 </tr>
               ))}

@@ -15,10 +15,12 @@ interface Vehicle {
   model: string;
   year: string;
   plate: string;
+  fuel: string;
   color: string;
 }
 
 const MAKES = ['Hyundai', 'Maruti Suzuki', 'Tata', 'Mahindra', 'Honda', 'Toyota', 'Kia', 'Volkswagen', 'Skoda', 'Ford', 'Other'];
+const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'EV', 'Hybrid'];
 
 export default function MyVehiclesPage() {
   const { user } = useAuthStore();
@@ -27,7 +29,7 @@ export default function MyVehiclesPage() {
   const [showQRForVehicle, setShowQRForVehicle] = useState<string | null>(null);
   
   // Modals state
-  const [form, setForm] = useState({ make: 'Hyundai', model: '', year: '', plate: '', color: '#FFFFFF' });
+  const [form, setForm] = useState({ make: 'Hyundai', model: '', year: '', plate: '', fuel: 'Petrol', color: '#FFFFFF' });
   const [loading, setLoading] = useState(true);
 
   // Booking Service State
@@ -49,7 +51,7 @@ export default function MyVehiclesPage() {
       const { data } = await supabase.from('vehicles').select('*').eq('customer_id', cust.id).order('created_at', { ascending: false });
       if (data) {
         setVehicles(data.map(v => ({
-          id: v.id, make: v.make, model: v.model, year: v.year?.toString() || '2020', plate: v.plate, color: v.color || '#FFFFFF'
+          id: v.id, make: v.make, model: v.model, year: v.year?.toString() || '2020', plate: v.plate, fuel: v.fuel || 'Unknown', color: v.color || '#FFFFFF'
         })));
       }
     }
@@ -74,6 +76,7 @@ export default function MyVehiclesPage() {
       model: form.model,
       year: parseInt(form.year, 10),
       plate: form.plate,
+      fuel: form.fuel,
       color: form.color
     }]).select();
 
@@ -83,10 +86,10 @@ export default function MyVehiclesPage() {
     }
 
     const v = data[0];
-    setVehicles(prev => [{ id: v.id, make: v.make, model: v.model, year: v.year?.toString() || form.year, plate: v.plate, color: v.color || form.color }, ...prev]);
+    setVehicles(prev => [{ id: v.id, make: v.make, model: v.model, year: v.year?.toString() || form.year, plate: v.plate, fuel: v.fuel || form.fuel, color: v.color || form.color }, ...prev]);
     toast.success(`${form.make} ${form.model} added to your Garage!`);
     setShowAddModal(false);
-    setForm({ make: 'Hyundai', model: '', year: '', plate: '', color: '#FFFFFF' });
+    setForm({ make: 'Hyundai', model: '', year: '', plate: '', fuel: 'Petrol', color: '#FFFFFF' });
   };
 
   const handleDelete = async (id: string) => {
@@ -177,6 +180,7 @@ export default function MyVehiclesPage() {
                 <div className="mt-2 inline-block bg-electricYellow text-[#1a1a1a] border-2 border-[#1a1a1a] font-mono text-sm px-3 py-1 font-black tracking-widest">
                   {v.plate}
                 </div>
+                <p className="mt-2 text-xs font-black uppercase tracking-wider text-gray-600">Fuel: {v.fuel}</p>
               </div>
             </div>
 
@@ -259,6 +263,18 @@ export default function MyVehiclesPage() {
                   placeholder="e.g. MH 04 AB 1234"
                   className="w-full p-3 bg-white border-2 border-[#1a1a1a] font-black font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-electricYellow uppercase"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase tracking-wider mb-1 text-gray-600">Fuel Type *</label>
+                <select
+                  value={form.fuel}
+                  onChange={e => setForm(f => ({ ...f, fuel: e.target.value }))}
+                  className="w-full p-3 bg-white border-2 border-[#1a1a1a] font-bold focus:outline-none focus:ring-2 focus:ring-electricYellow"
+                >
+                  {FUEL_TYPES.map((fuel) => (
+                    <option key={fuel} value={fuel}>{fuel}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-black uppercase tracking-wider mb-1 text-gray-600">Vehicle Color</label>

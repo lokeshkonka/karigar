@@ -3,15 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Search, Plus, Filter } from 'lucide-react';
 
 export default function VehiclesPage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const owner = searchParams.get('owner');
+    if (owner) setSearchTerm(owner);
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadVehicles() {
@@ -26,7 +33,7 @@ export default function VehiclesPage() {
           make: v.make,
           model: v.model,
           year: v.year,
-          fuel: v.fuel || 'Petrol',
+          fuel: v.fuel || 'Unknown',
           owner: v.customers?.[0]?.name || v.customers?.name || 'Walk-In',
           jobs: 0
         })));
@@ -35,6 +42,16 @@ export default function VehiclesPage() {
     }
     loadVehicles();
   }, []);
+
+  const filteredVehicles = vehicles.filter((v) => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      v.plate.toLowerCase().includes(q) ||
+      `${v.make} ${v.model}`.toLowerCase().includes(q) ||
+      v.owner.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -54,6 +71,8 @@ export default function VehiclesPage() {
           <div className="relative">
             <Search className="absolute left-3 top-3.5 text-gray-500" size={18} />
             <input 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-white border-neo focus:outline-none focus:ring-2 focus:ring-electricYellow" 
               placeholder="Search by Plate, Make, or Owner..."
             />
@@ -69,7 +88,7 @@ export default function VehiclesPage() {
           <div className="col-span-3 p-8 text-center font-bold text-gray-500 uppercase tracking-widest text-xl">
             Loading Vehicle Fleet...
           </div>
-        ) : vehicles.map((v) => (
+        ) : filteredVehicles.map((v) => (
           <Card key={v.id} className="flex flex-col">
             <div className="aspect-video bg-[#1a1a1a] mb-4 flex items-center justify-center border-neo-sm relative overflow-hidden group">
               <span className="text-electricYellow font-black tracking-widest opacity-20 text-4xl transform -rotate-12">
@@ -98,6 +117,11 @@ export default function VehiclesPage() {
             </div>
           </Card>
         ))}
+        {!loading && filteredVehicles.length === 0 && (
+          <div className="col-span-3 p-8 text-center font-bold text-gray-500 uppercase tracking-widest text-xl">
+            No vehicles matched your search.
+          </div>
+        )}
       </div>
     </div>
   );

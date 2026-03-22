@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/Button';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
-import { Layers, AlertCircle, AlertTriangle, Plus, Search, Grid, List as ListIcon } from 'lucide-react';
+import { Layers, AlertCircle, AlertTriangle, Plus, Search, Grid, List as ListIcon, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import toast from 'react-hot-toast';
 
 // Dynamic data from DB
 
@@ -19,33 +20,98 @@ export default function InventoryPage() {
   const [search, setSearch] = useState('');
   const [inventory, setInventory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [partForm, setPartForm] = useState({
+    sku: '',
+    name: '',
+    stock: 0,
+    min: 5,
+    cost: 0,
+    sell: 0,
+    supplier: '',
+  });
+
+  const mapInventoryRow = (item: any) => {
+    let status = 'good';
+    if (item.stock === 0) status = 'out';
+    else if (item.stock <= item.min_stock) status = 'low';
+    return {
+      id: item.id.toString(),
+      name: item.name,
+      sku: item.sku,
+      stock: item.stock,
+      min: item.min_stock,
+      cost: Number(item.cost) || 0,
+      sell: Number(item.retail) || 0,
+      supplier: item.supplier || 'Unknown',
+      status
+    };
+  };
+
+  async function fetchInventory() {
+    setLoading(true);
+    const { data, error } = await supabase.from('inventory').select('*').order('name', { ascending: true });
+    if (!error && data) {
+      setInventory(data.map(mapInventoryRow));
+    } else if (error) {
+      toast.error('Failed to load inventory');
+    }
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function fetchInventory() {
-      const { data, error } = await supabase.from('inventory').select('*');
-      if (!error && data && data.length > 0) {
-        const mapped = data.map((item: any) => {
-          let status = 'good';
-          if (item.stock === 0) status = 'out';
-          else if (item.stock <= item.min_stock) status = 'low';
-          return {
-            id: item.id.toString(),
-            name: item.name,
-            sku: item.sku,
-            stock: item.stock,
-            min: item.min_stock,
-            cost: item.cost,
-            sell: item.retail,
-            supplier: item.supplier || 'Unknown',
-            status: status
-          };
-        });
-        setInventory(mapped);
-      }
-      setLoading(false);
-    }
     fetchInventory();
   }, []);
+
+  async function adjustStock(itemId: string, delta: number) {
+    const item = inventory.find((entry) => entry.id === itemId);
+    if (!item) return;
+    const nextStock = Math.max(0, Number(item.stock) + delta);
+    const { error } = await supabase.from('inventory').update({ stock: nextStock }).eq('id', itemId);
+    if (error) {
+      toast.error('Failed to adjust stock');
+      return;
+    }
+
+    setInventory((prev) =>
+      prev.map((entry) => {
+        if (entry.id !== itemId) return entry;
+        const updated = { ...entry, stock: nextStock };
+        if (updated.stock === 0) updated.status = 'out';
+        else if (updated.stock <= updated.min) updated.status = 'low';
+        else updated.status = 'good';
+        return updated;
+      })
+    );
+  }
+
+  async function handleAddPart() {
+    if (!partForm.sku || !partForm.name) {
+      toast.error('SKU and part name are required');
+      return;
+    }
+    setSaving(true);
+    const payload = {
+      sku: partForm.sku.trim().toUpperCase(),
+      name: partForm.name.trim(),
+      stock: Number(partForm.stock) || 0,
+      min_stock: Number(partForm.min) || 0,
+      cost: Number(partForm.cost) || 0,
+      retail: Number(partForm.sell) || 0,
+      supplier: partForm.supplier.trim() || null,
+    };
+    const { error } = await supabase.from('inventory').insert(payload);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message || 'Failed to add part');
+      return;
+    }
+    toast.success('Part added to inventory');
+    setShowAddModal(false);
+    setPartForm({ sku: '', name: '', stock: 0, min: 5, cost: 0, sell: 0, supplier: '' });
+    fetchInventory();
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -55,7 +121,7 @@ export default function InventoryPage() {
             Parts Inventory
           </h1>
         </div>
-        <Button className="flex items-center gap-2">
+        <Button onClick={() => setShowAddModal(true)} className="flex items-center gap-2">
           <Plus size={18} strokeWidth={3} />
           Add Part
         </Button>
@@ -159,8 +225,8 @@ export default function InventoryPage() {
               </div>
 
               <div className="mt-auto flex gap-2">
-                <Button variant="outline" className="flex-1 text-xs py-2 shadow-neo-sm">Adjust</Button>
-                <Button variant="primary" className={`flex-1 text-xs py-2 shadow-neo-sm ${item.status === 'out' ? 'animate-pulse' : ''}`}>Reorder</Button>
+                <Button variant="outline" onClick={() => adjustStock(item.id, -1)} className="flex-1 text-xs py-2 shadow-neo-sm">Stock -1</Button>
+                <Button variant="primary" onClick={() => adjustStock(item.id, 1)} className="flex-1 text-xs py-2 shadow-neo-sm">Stock +1</Button>
               </div>
             </Card>
           ))}
@@ -197,7 +263,10 @@ export default function InventoryPage() {
                       </Badge>
                     </td>
                     <td className="p-4">
-                      <Button variant="outline" className="px-3 py-1 text-xs shadow-neo-xs">Reorder</Button>
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => adjustStock(item.id, -1)} className="px-3 py-1 text-xs shadow-neo-xs">-1</Button>
+                        <Button variant="primary" onClick={() => adjustStock(item.id, 1)} className="px-3 py-1 text-xs shadow-neo-xs">+1</Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -225,6 +294,30 @@ export default function InventoryPage() {
           </BarChart>
         </ResponsiveContainer>
       </Card>
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a]/80 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-xl bg-cream p-6 border-4 border-[#1a1a1a] shadow-[8px_8px_0_#1a1a1a]">
+            <div className="flex justify-between items-center mb-6 border-b-2 border-[#1a1a1a] pb-2">
+              <h2 className="text-2xl font-black uppercase tracking-widest">Add Inventory Part</h2>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-500 hover:text-red"><X size={22} /></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input value={partForm.sku} onChange={(e) => setPartForm((p) => ({ ...p, sku: e.target.value.toUpperCase() }))} placeholder="SKU" className="border-2 border-[#1a1a1a] p-3 font-bold" />
+              <input value={partForm.name} onChange={(e) => setPartForm((p) => ({ ...p, name: e.target.value }))} placeholder="Part Name" className="border-2 border-[#1a1a1a] p-3 font-bold" />
+              <input type="number" value={partForm.stock} onChange={(e) => setPartForm((p) => ({ ...p, stock: Number(e.target.value) }))} placeholder="Stock" className="border-2 border-[#1a1a1a] p-3 font-bold" />
+              <input type="number" value={partForm.min} onChange={(e) => setPartForm((p) => ({ ...p, min: Number(e.target.value) }))} placeholder="Min Stock" className="border-2 border-[#1a1a1a] p-3 font-bold" />
+              <input type="number" value={partForm.cost} onChange={(e) => setPartForm((p) => ({ ...p, cost: Number(e.target.value) }))} placeholder="Cost" className="border-2 border-[#1a1a1a] p-3 font-bold" />
+              <input type="number" value={partForm.sell} onChange={(e) => setPartForm((p) => ({ ...p, sell: Number(e.target.value) }))} placeholder="Retail" className="border-2 border-[#1a1a1a] p-3 font-bold" />
+              <input value={partForm.supplier} onChange={(e) => setPartForm((p) => ({ ...p, supplier: e.target.value }))} placeholder="Supplier" className="border-2 border-[#1a1a1a] p-3 font-bold md:col-span-2" />
+            </div>
+            <div className="flex gap-3 mt-6">
+              <Button variant="outline" onClick={() => setShowAddModal(false)} className="flex-1">Cancel</Button>
+              <Button onClick={handleAddPart} disabled={saving} className="flex-1">{saving ? 'Saving...' : 'Save Part'}</Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

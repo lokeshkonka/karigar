@@ -6,18 +6,13 @@ import { supabase } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Plus, Search, Filter, Phone, Mail, MoreHorizontal, X, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import Link from 'next/link';
+import { Search, Phone, Mail } from 'lucide-react';
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Modal State
-  const [showModal, setShowModal] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', email: '' });
 
   async function loadCustomers() {
     setLoading(true);
@@ -45,23 +40,6 @@ export default function CustomersPage() {
   }
 
   useEffect(() => { loadCustomers(); }, []);
-
-  const handleAddCustomer = async () => {
-    if (!form.name) { toast.error('Name is required'); return; }
-    setSaving(true);
-    const { error } = await supabase.from('customers').insert([{
-       name: form.name,
-       phone: form.phone,
-       email: form.email,
-       tier: 'BRONZE'
-    }]);
-    setSaving(false);
-    if (error) { toast.error(error.message); return; }
-    toast.success('Customer added');
-    setShowModal(false);
-    setForm({ name: '', phone: '', email: '' });
-    loadCustomers();
-  };
 
   const exportCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
@@ -93,9 +71,6 @@ export default function CustomersPage() {
         <div>
           <h1 className="text-4xl font-black uppercase tracking-widest text-[#1a1a1a]">Customer CRM</h1>
         </div>
-        <Button onClick={() => setShowModal(true)} className="flex items-center gap-2">
-          <Plus size={18} strokeWidth={3} /> Add Customer
-        </Button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6 relative">
@@ -165,10 +140,27 @@ export default function CustomersPage() {
                   <td className="p-4 border-r-2 border-[#1a1a1a] text-right font-black text-lg text-green whitespace-nowrap">
                     ₹ {cust.spent.toLocaleString()}
                   </td>
-                  <td className="p-4 text-center">
-                    <Button variant="outline" className="px-3 py-1 bg-white hover:bg-cream">
-                      <MoreHorizontal size={18} />
-                    </Button>
+                  <td className="p-4">
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`tel:${cust.phone}`}
+                        className="px-2 py-1 border-2 border-[#1a1a1a] bg-white font-black text-[10px] uppercase tracking-wider hover:bg-cream"
+                      >
+                        Call
+                      </a>
+                      <a
+                        href={`mailto:${cust.email}`}
+                        className="px-2 py-1 border-2 border-[#1a1a1a] bg-white font-black text-[10px] uppercase tracking-wider hover:bg-cream"
+                      >
+                        Email
+                      </a>
+                      <Link
+                        href={`/admin/vehicles?owner=${encodeURIComponent(cust.name)}`}
+                        className="px-2 py-1 border-2 border-[#1a1a1a] bg-electricYellow font-black text-[10px] uppercase tracking-wider hover:bg-[#1a1a1a] hover:text-white"
+                      >
+                        Vehicles
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -192,36 +184,6 @@ export default function CustomersPage() {
             <p className="text-5xl font-black mt-2">{stats.bronze}</p>
          </Card>
       </div>
-
-      {/* Add Customer Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1a1a]/80 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md bg-cream p-6 border-4 border-[#1a1a1a] shadow-[8px_8px_0px_#1a1a1a]">
-            <div className="flex justify-between items-center mb-6">
-               <h2 className="text-2xl font-black uppercase tracking-widest">New Customer</h2>
-               <button onClick={() => setShowModal(false)}><X className="text-gray-500 hover:text-red transition-colors"/></button>
-            </div>
-            <div className="space-y-4">
-               <div>
-                  <label className="block text-xs font-black uppercase mb-1 tracking-wider">Full Name</label>
-                  <input value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="w-full border-2 border-[#1a1a1a] p-3 font-bold focus:ring-2 focus:ring-electricYellow outline-none" />
-               </div>
-               <div>
-                  <label className="block text-xs font-black uppercase mb-1 tracking-wider">Phone Number</label>
-                  <input value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} className="w-full border-2 border-[#1a1a1a] p-3 font-bold focus:ring-2 focus:ring-electricYellow outline-none" />
-               </div>
-               <div>
-                  <label className="block text-xs font-black uppercase mb-1 tracking-wider">Email Address</label>
-                  <input type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} className="w-full border-2 border-[#1a1a1a] p-3 font-bold focus:ring-2 focus:ring-electricYellow outline-none" />
-               </div>
-               <div className="flex gap-4 pt-4">
-                 <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1 bg-white">Cancel</Button>
-                 <Button onClick={handleAddCustomer} disabled={saving} className="flex-1">{saving ? 'Saving...' : 'Save Customer'}</Button>
-               </div>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

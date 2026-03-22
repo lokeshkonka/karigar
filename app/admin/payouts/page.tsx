@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { DollarSign, Search, CheckCircle, Loader2 } from 'lucide-react';
+import { DollarSign, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminPayoutsPage() {
@@ -16,6 +16,7 @@ export default function AdminPayoutsPage() {
   const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [payoutAmount, setPayoutAmount] = useState('');
+  const [recommendedPayout, setRecommendedPayout] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -23,8 +24,12 @@ export default function AdminPayoutsPage() {
 
   async function fetchData() {
     setLoading(true);
-    // Fetch Staff Check
-    const { data: staffData } = await supabase.from('staff_profiles').select('*').eq('role', 'staff');
+    // Fetch active technician profiles. Existing code used role='staff', but DB stores role as TECHNICIAN/MANAGER.
+    const { data: staffData } = await supabase
+      .from('staff_profiles')
+      .select('id, name, role, status, hourly_rate')
+      .in('role', ['TECHNICIAN', 'MANAGER'])
+      .order('name', { ascending: true });
     setStaffList(staffData || []);
 
     // Fetch previous Payouts History
@@ -46,17 +51,27 @@ export default function AdminPayoutsPage() {
       .from('work_orders')
       .select(`
         id, type, status, created_at, priority,
+        invoices(amount, status),
         vehicles(plate)
       `)
       .eq('assigned_mechanic_id', staffId)
-      .in('status', ['READY', 'QUALITY', 'DELIVERED'])
+      .in('status', ['READY', 'DELIVERED'])
       .order('updated_at', { ascending: false });
 
-    // In a real flow, you'd track WHICH jobs were paid out using a bridge table or flags.
-    setCompletedJobs(jobs || []);
-    
-    // Auto calculate recommended payout (₹500 base per completed job)
-    const recommended = (jobs || []).length * 50;
+    const safeJobs = jobs || [];
+    setCompletedJobs(safeJobs);
+
+    // Recommend payout as 30% of paid invoice revenue for these completed jobs.
+    const paidRevenue = safeJobs.reduce((sum: number, job: any) => {
+      const invoiceRows = Array.isArray(job.invoices) ? job.invoices : job.invoices ? [job.invoices] : [];
+      const paidForJob = invoiceRows
+        .filter((invoice: any) => invoice.status === 'paid')
+        .reduce((acc: number, invoice: any) => acc + (Number(invoice.amount) || 0), 0);
+      return sum + paidForJob;
+    }, 0);
+
+    const recommended = Math.max(0, Math.round(paidRevenue * 0.3));
+    setRecommendedPayout(recommended);
     setPayoutAmount(recommended.toString());
   }
 
@@ -79,6 +94,8 @@ export default function AdminPayoutsPage() {
       toast.success(`₹${payoutAmount} paid to ${selectedStaff.name}`);
       setPayoutAmount('');
       setSelectedStaff(null);
+      setCompletedJobs([]);
+      setRecommendedPayout(0);
       fetchData();
     }
   };
@@ -120,8 +137,12 @@ export default function AdminPayoutsPage() {
                   className={`w-full text-left p-3 border-2 font-bold uppercase transition-transform ${selectedStaff?.id === s.id ? 'bg-electricYellow border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] translate-x-1' : 'bg-cream border-dashed border-gray-400 hover:border-[#1a1a1a] hover:bg-gray-100'}`}
                 >
                   <p className="text-[#1a1a1a]">{s.name}</p>
+                  <p className="text-[10px] text-gray-600 mt-1">{s.role}</p>
                 </button>
               ))}
+              {staffList.length === 0 && (
+                <p className="text-sm font-bold text-gray-500 uppercase text-center py-4">No technician profiles found</p>
+              )}
             </div>
           </Card>
 
@@ -141,6 +162,9 @@ export default function AdminPayoutsPage() {
                   onChange={e => setPayoutAmount(e.target.value)}
                   className="w-full text-3xl font-black p-4 border-4 border-[#1a1a1a] outline-none focus:ring-4 focus:ring-electricYellow/50 text-center" 
                 />
+                <p className="text-xs font-bold text-gray-500 mt-2">
+                  Recommended: ₹{recommendedPayout.toLocaleString()} ({completedJobs.length} completed jobs)
+                </p>
               </div>
 
               <Button onClick={handleIssuePayout} className="w-full py-6 text-xl bg-green hover:bg-green-600 text-white border-4 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] uppercase font-black tracking-widest">
@@ -152,6 +176,39 @@ export default function AdminPayoutsPage() {
 
         {/* Right Column: Performance Jobs & History */}
         <div className="lg:col-span-2 space-y-6">
+          {selectedStaff && (
+            <Card className="bg-white border-4 border-[#1a1a1a] shadow-[6px_6px_0_#1a1a1a] p-6">
+              <h2 className="text-xl font-black uppercase tracking-widest mb-4">
+                Completed Jobs · {selectedStaff.name}
+              </h2>
+              <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+                {completedJobs.length === 0 ? (
+                  <p className="text-sm font-bold text-gray-500 uppercase">No completed jobs found for this technician.</p>
+                ) : (
+                  completedJobs.map((job) => {
+                    const vehicle = Array.isArray(job.vehicles) ? job.vehicles[0] : job.vehicles;
+                    const invoiceRows = Array.isArray(job.invoices) ? job.invoices : job.invoices ? [job.invoices] : [];
+                    const paidRevenue = invoiceRows
+                      .filter((invoice: any) => invoice.status === 'paid')
+                      .reduce((sum: number, invoice: any) => sum + (Number(invoice.amount) || 0), 0);
+                    return (
+                      <div key={job.id} className="border-2 border-dashed border-gray-300 p-3 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-black uppercase text-sm text-[#1a1a1a]">{job.type}</p>
+                          <p className="text-xs font-bold text-gray-500">{vehicle?.plate || 'Unknown Plate'} · {new Date(job.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs font-black uppercase text-gray-500">Paid Invoice</p>
+                          <p className="font-black text-green-700">₹{paidRevenue.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </Card>
+          )}
+
           <Card className="bg-white border-4 border-[#1a1a1a] shadow-[6px_6px_0_#1a1a1a] p-6">
             <h2 className="text-xl font-black uppercase tracking-widest mb-4">Payout Ledger</h2>
             <div className="overflow-x-auto">

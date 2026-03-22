@@ -53,29 +53,38 @@ export default function StaffPayoutsPage() {
         }
       });
       setStats({ total: tot, pending: pen, thisMonth: curr });
-    }
 
-    // Calculate unclaimed completed invoice revenue (simulate standard 30% cut)
-    const { data: woData } = await supabase
-      .from('work_orders')
-      .select('id, invoices(amount, status)')
-      .eq('assigned_mechanic_id', profile.id)
-      .eq('status', 'DELIVERED');
+      // Calculate unclaimed completed invoice revenue as real 30% share minus already raised payouts.
+      const { data: woData } = await supabase
+        .from('work_orders')
+        .select('id, invoices(amount, status)')
+        .eq('assigned_mechanic_id', profile.id)
+        .eq('status', 'DELIVERED');
 
-    if (woData) {
-      let revenue = 0;
-      woData.forEach(wo => {
-        if (Array.isArray(wo.invoices)) {
-           wo.invoices.forEach((inv: any) => { if (inv.status === 'paid') revenue += Number(inv.amount); });
-        } else if (wo.invoices) {
-           const inv = wo.invoices as any;
-           if (inv.status === 'paid') revenue += Number(inv.amount);
-        }
-      });
-      // Mechanics make a 30% cut of claimed invoice revenue (minus what's already paid/pending)
-      // For demonstration, we'll arbitrarily show a flat 1500 to subtract existing stats to find 'available'
-      const estimatedCut = (revenue * 0.3) - (stats.total + stats.pending);
-      setUnclaimedRevenue(estimatedCut > 0 ? estimatedCut : 0);
+      if (woData) {
+        let paidInvoiceRevenue = 0;
+        woData.forEach((wo) => {
+          if (Array.isArray(wo.invoices)) {
+            wo.invoices.forEach((inv: any) => {
+              if (inv.status === 'paid') paidInvoiceRevenue += Number(inv.amount) || 0;
+            });
+          } else if (wo.invoices) {
+            const inv = wo.invoices as any;
+            if (inv.status === 'paid') paidInvoiceRevenue += Number(inv.amount) || 0;
+          }
+        });
+
+        const eligibleShare = paidInvoiceRevenue * 0.3;
+        const alreadyIssued = tot + pen;
+        const remaining = eligibleShare - alreadyIssued;
+        setUnclaimedRevenue(remaining > 0 ? remaining : 0);
+      } else {
+        setUnclaimedRevenue(0);
+      }
+    } else {
+      setPayouts([]);
+      setStats({ total: 0, pending: 0, thisMonth: 0 });
+      setUnclaimedRevenue(0);
     }
     setLoading(false);
   }
