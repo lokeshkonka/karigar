@@ -3,13 +3,14 @@
 import React from 'react';
 import { PermissionGuard } from '@/components/auth/PermissionGuard';
 import { CollapsibleSidebar } from '@/components/layout/CollapsibleSidebar';
-import { Wrench, Users, QrCode, DollarSign, Star } from 'lucide-react';
+import { Wrench, Users, QrCode, DollarSign, Star, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const BOTTOM_NAV = [
   { href: '/staff/dashboard', icon: Wrench, label: 'Jobs' },
   { href: '/staff/customers', icon: Users, label: 'Customers' },
+  { href: '/staff/schedule', icon: CalendarDays, label: 'Schedule' },
   { href: '/staff/scan', icon: QrCode, label: 'Scan' },
   { href: '/staff/payouts', icon: DollarSign, label: 'Payouts' },
   { href: '/staff/reviews', icon: Star, label: 'Reviews' },

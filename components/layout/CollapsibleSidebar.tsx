@@ -35,6 +35,7 @@ const ADMIN_ITEMS = [
 const STAFF_ITEMS = [
   { icon: Wrench,     label: 'My Jobs',    href: '/staff/dashboard' },
   { icon: Users,      label: 'Customers',  href: '/staff/customers' },
+  { icon: CalendarDays,label: 'Schedule',  href: '/staff/schedule' },
   { icon: Map,        label: 'Garage Map', href: '/staff/garage-map' },
   { icon: QrCode,     label: 'Scan',       href: '/staff/scan' },
   { icon: DollarSign, label: 'Payouts',    href: '/staff/payouts' },

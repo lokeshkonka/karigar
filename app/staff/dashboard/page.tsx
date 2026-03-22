@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Loader } from '@/components/ui/Loader';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -11,7 +12,6 @@ import toast from 'react-hot-toast';
 
 export default function StaffDashboardPage() {
   const { user } = useAuthStore();
-  const isTechnicianReadOnly = user?.role === 'TECHNICIAN';
   const [profileId, setProfileId] = useState<string | null>(null);
   const [activeJob, setActiveJob] = useState<any>(null);
   const [waitingJobs, setWaitingJobs] = useState<any[]>([]);
@@ -66,10 +66,11 @@ export default function StaffDashboardPage() {
       setActiveJob(null);
     }
 
-    // 2. Get waiting queue (allotted to this tech)
+    // 2. Get assigned queue (admin-assigned work orders for this technician)
     const { data: waiting } = await supabase.from('work_orders')
       .select('id, type, issue_description, priority, status, created_at, vehicles(plate, make, model)')
-      .in('status', ['WAITING', 'DIAGNOSED'])
+      .neq('status', 'DELIVERED')
+      .neq('status', 'INPROGRESS')
       .eq('assigned_mechanic_id', profile.id)
       .order('created_at', { ascending: true });
 
@@ -89,53 +90,80 @@ export default function StaffDashboardPage() {
   }
 
   const handleStartJob = async (jobId: string) => {
-    if (isTechnicianReadOnly) {
-      toast.error('Technician accounts are view-only for work order updates.');
-      return;
-    }
     if (activeJob) { toast.error('You already have an active job!'); return; }
     await supabase.from('work_orders').update({
       status: 'INPROGRESS',
       started_at: new Date().toISOString()
-    }).eq('id', jobId);
+    }).eq('id', jobId).eq('assigned_mechanic_id', profileId);
     toast.success('Job Started');
     load();
   };
 
-  const openInvoiceModal = () => {
-    if (isTechnicianReadOnly) {
-      toast.error('Technician accounts are view-only for work order updates.');
+  const updateAssignedTaskStatus = async (jobId: string, status: string) => {
+    if (!profileId) return;
+    if (status === 'INPROGRESS' && activeJob && activeJob.id !== jobId) {
+      toast.error('You already have an active job');
       return;
     }
+
+    const payload: Record<string, any> = { status };
+    if (status === 'INPROGRESS') payload.started_at = new Date().toISOString();
+
+    const { error } = await supabase
+      .from('work_orders')
+      .update(payload)
+      .eq('id', jobId)
+      .eq('assigned_mechanic_id', profileId);
+
+    if (error) {
+      toast.error('Unable to update work order status');
+      return;
+    }
+
+    toast.success(`Work order moved to ${status}`);
+    load();
+  };
+
+  const openInvoiceModal = () => {
     if (!activeJob) return;
     setInvoiceAmount('');
     setShowInvoiceModal(true);
   };
 
   const handleCompleteJob = async () => {
-    if (isTechnicianReadOnly) {
-      toast.error('Technician accounts are view-only for work order updates.');
-      return;
-    }
     if (!activeJob || invoiceAmount === '') {
       toast.error('Please enter a valid amount');
       return;
     }
 
     // 1. Update WO to READY
-    await supabase.from('work_orders').update({ status: 'READY' }).eq('id', activeJob.id); 
+    await supabase.from('work_orders').update({ status: 'READY' }).eq('id', activeJob.id).eq('assigned_mechanic_id', profileId); 
 
     // 2. Get customer_id to link invoice
     const { data: woData } = await supabase.from('work_orders').select('customer_id').eq('id', activeJob.id).single();
 
-    // 3. Generate the Invoice
-    await supabase.from('invoices').insert({
-      work_order_id: activeJob.id,
+    // 3. Create or update invoice for this work order
+    const { data: existingInvoice } = await supabase
+      .from('invoices')
+      .select('id')
+      .eq('work_order_id', activeJob.id)
+      .maybeSingle();
+
+    const invoicePayload = {
       customer_id: woData?.customer_id || null,
       amount: Number(invoiceAmount),
       status: 'pending',
       due_date: new Date(Date.now() + 7 * 86400000).toISOString()
-    });
+    };
+
+    if (existingInvoice?.id) {
+      await supabase.from('invoices').update(invoicePayload).eq('id', existingInvoice.id);
+    } else {
+      await supabase.from('invoices').insert({
+        work_order_id: activeJob.id,
+        ...invoicePayload,
+      });
+    }
 
     toast.success('Job marked READY & Invoice sent to Customer!');
     setShowInvoiceModal(false);
@@ -143,10 +171,6 @@ export default function StaffDashboardPage() {
   };
 
   const submitPartsRequest = async () => {
-    if (isTechnicianReadOnly) {
-      toast.error('Technician accounts are view-only for work order updates.');
-      return;
-    }
     if (!partForm.name) { toast.error('Part name required'); return; }
     await supabase.from('parts_tickets').insert({
       work_order_id: activeJob.id,
@@ -161,10 +185,6 @@ export default function StaffDashboardPage() {
   };
 
   const updateBay = async () => {
-    if (isTechnicianReadOnly) {
-      toast.error('Technician accounts are view-only for work order updates.');
-      return;
-    }
     if (!activeJob || !bayForm) return;
     
     // Check if appointment exists for this WO
@@ -209,11 +229,6 @@ export default function StaffDashboardPage() {
         {/* Active Job Dashboard */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-3xl font-black uppercase tracking-widest text-[#1a1a1a] border-b-4 border-[#1a1a1a] inline-block pb-1">Active Job</h2>
-          {isTechnicianReadOnly && (
-            <div className="bg-cream border-2 border-dashed border-[#1a1a1a] px-4 py-2 font-black text-xs uppercase tracking-widest text-gray-700 inline-block">
-              View-only mode for technician role
-            </div>
-          )}
           
           {!activeJob ? (
             <Card className="bg-white border-4 border-[#1a1a1a] shadow-[6px_6px_0_#1a1a1a] p-12 text-center text-gray-400 font-black uppercase tracking-widest">
@@ -237,8 +252,7 @@ export default function StaffDashboardPage() {
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-3xl font-black uppercase leading-tight">{activeJob.type}</h3>
                 <button 
-                  onClick={() => !isTechnicianReadOnly && setShowBayModal(true)}
-                  disabled={isTechnicianReadOnly}
+                  onClick={() => setShowBayModal(true)}
                   className="flex items-center gap-2 bg-cream border-2 border-[#1a1a1a] px-3 py-1 font-black text-sm uppercase shadow-[2px_2px_0_#1a1a1a] hover:bg-electricYellow transition-colors"
                 >
                   <MapPin size={16} /> {activeJob.bay}
@@ -255,7 +269,7 @@ export default function StaffDashboardPage() {
                 <Button onClick={openInvoiceModal} className="flex-1 py-5 text-[15px] font-black tracking-widest uppercase flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] border-2 border-[#1a1a1a]">
                   <CheckCircle size={22} /> MARK READY & SEND INVOICE
                 </Button>
-                <Button onClick={() => !isTechnicianReadOnly && setShowPartsModal(true)} disabled={isTechnicianReadOnly} variant="outline" className="flex-1 py-5 text-[15px] font-black tracking-widest uppercase flex items-center justify-center gap-3 bg-white hover:bg-cream shadow-[4px_4px_0_#1a1a1a] border-4 border-[#1a1a1a] text-[#1a1a1a]">
+                <Button onClick={() => setShowPartsModal(true)} variant="outline" className="flex-1 py-5 text-[15px] font-black tracking-widest uppercase flex items-center justify-center gap-3 bg-white hover:bg-cream shadow-[4px_4px_0_#1a1a1a] border-4 border-[#1a1a1a] text-[#1a1a1a]">
                   <PackagePlus size={22} /> REQUEST PARTS
                 </Button>
               </div>
@@ -283,32 +297,50 @@ export default function StaffDashboardPage() {
               </div>
             )}
             
-            <Button variant="outline" className="w-full mt-4 flex items-center justify-center gap-2 border-2 border-dashed border-[#1a1a1a] text-xs">
-              <Map size={14} /> Global Roster Calendar
-            </Button>
+            <Link href="/staff/schedule" className="block">
+              <Button variant="outline" className="w-full mt-4 flex items-center justify-center gap-2 border-2 border-dashed border-[#1a1a1a] text-xs">
+                <Map size={14} /> Open My Schedule Calendar
+              </Button>
+            </Link>
           </Card>
         </div>
       </div>
 
       {/* Allotted Queue */}
-      <h2 className="text-2xl font-black uppercase tracking-widest text-[#1a1a1a] border-b-4 border-[#1a1a1a] inline-block pb-1 mt-8">My Allotted Tasks</h2>
+      <h2 className="text-2xl font-black uppercase tracking-widest text-[#1a1a1a] border-b-4 border-[#1a1a1a] inline-block pb-1 mt-8">My Assigned Work Orders</h2>
       <div className="space-y-4 max-w-4xl">
         {waitingJobs.length === 0 ? (
-          <div className="border-4 border-dashed border-gray-300 p-8 text-center text-gray-400 font-black uppercase">Your queue is currently empty.</div>
+          <div className="border-4 border-dashed border-gray-300 p-8 text-center text-gray-400 font-black uppercase">No admin-assigned work orders right now.</div>
         ) : waitingJobs.map(job => {
           const v = Array.isArray(job.vehicles) ? job.vehicles[0] : job.vehicles;
+          const canStart = job.status === 'WAITING' || job.status === 'DIAGNOSED';
           return (
             <Card key={job.id} className="bg-white border-4 border-[#1a1a1a] shadow-[4px_4px_0px_#1a1a1a] flex flex-col md:flex-row items-center justify-between gap-4 py-4 px-6 hover:-translate-y-1 hover:shadow-[6px_6px_0px_#FFE500] transition-all">
               <div>
                 <div className="flex gap-2 items-center mb-1">
                   <div className="font-mono text-[#1a1a1a] font-black tracking-widest bg-electricYellow px-2 py-1 inline-block border-neo-sm text-sm">{v?.plate || 'UNKNOWN'}</div>
                   <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 ${job.priority === 'urgent' ? 'bg-red text-white' : 'bg-gray-200 text-gray-600'}`}>{job.priority}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 bg-blue text-white">{job.status}</span>
                 </div>
                 <h4 className="text-[#1a1a1a] font-black uppercase text-xl leading-none">{job.type}</h4>
                 <p className="text-sm font-bold text-gray-500 uppercase mt-1 line-clamp-1">{job.issue_description}</p>
+                <div className="mt-3">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 block mb-1">Update Status</label>
+                  <select
+                    value={job.status}
+                    onChange={(e) => updateAssignedTaskStatus(job.id, e.target.value)}
+                    className="border-2 border-[#1a1a1a] bg-white px-2 py-1 font-black text-xs uppercase"
+                  >
+                    <option value="WAITING">WAITING</option>
+                    <option value="DIAGNOSED">DIAGNOSED</option>
+                    <option value="QUALITY">QUALITY</option>
+                    <option value="READY">READY</option>
+                    <option value="INPROGRESS">INPROGRESS</option>
+                  </select>
+                </div>
               </div>
-              <Button onClick={() => handleStartJob(job.id)} disabled={!!activeJob || isTechnicianReadOnly} className="shrink-0 bg-[#1a1a1a] text-white hover:bg-electricYellow hover:text-[#1a1a1a] border-2 border-[#1a1a1a] font-black uppercase tracking-wider py-6 px-8">
-                <Play size={18} className="mr-2" /> {isTechnicianReadOnly ? 'View Only' : 'Start Repair'}
+              <Button onClick={() => handleStartJob(job.id)} disabled={!!activeJob || !canStart} className="shrink-0 bg-[#1a1a1a] text-white hover:bg-electricYellow hover:text-[#1a1a1a] border-2 border-[#1a1a1a] font-black uppercase tracking-wider py-6 px-8">
+                <Play size={18} className="mr-2" /> Start Repair
               </Button>
             </Card>
           )

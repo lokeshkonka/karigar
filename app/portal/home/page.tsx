@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import {
   Wrench, CheckCircle2, ChevronRight, Calendar,
-  MessageSquare, LogOut, Plus, Star
+  LogOut, Plus, Star
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/lib/supabase';
@@ -29,6 +29,7 @@ export default function CustomerHomePage() {
   const router = useRouter();
   
   const [activeJob, setActiveJob] = useState<any>(null);
+  const [bookedServices, setBookedServices] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -78,6 +79,30 @@ export default function CustomerHomePage() {
           eta: 'Pending',
           amount: 'Estimating',
         });
+      }
+
+      // Fetch all booked appointments for this customer (across dates)
+      const { data: apptData } = await supabase
+        .from('appointments')
+        .select('id, bay, start_time, duration_hours, title, type, work_orders(status, type, plate)')
+        .eq('customer_id', customer.id)
+        .order('start_time', { ascending: true });
+
+      if (apptData) {
+        setBookedServices(apptData.map((appointment: any) => {
+          const workOrder = Array.isArray(appointment.work_orders) ? appointment.work_orders[0] : appointment.work_orders;
+          return {
+            id: appointment.id,
+            plate: workOrder?.plate || 'Unknown',
+            service: workOrder?.type || appointment.title || 'Service',
+            status: (workOrder?.status || 'WAITING').toUpperCase(),
+            bay: appointment.bay || 'Unassigned',
+            start: appointment.start_time,
+            duration: appointment.duration_hours || 1,
+          };
+        }));
+      } else {
+        setBookedServices([]);
       }
       setLoading(false);
     }
@@ -183,6 +208,54 @@ export default function CustomerHomePage() {
         </Card>
       </section>
       )}
+
+      {/* Booked Services Schedule */}
+      <section>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="font-black text-sm tracking-widest uppercase text-[#1a1a1a] border-b-4 border-orange inline-block pb-1">
+            Booked Services
+          </h2>
+          <Link href="/portal/vehicles" className="text-xs font-black uppercase border-2 border-[#1a1a1a] px-3 py-2 hover:bg-[#1a1a1a] hover:text-white transition-colors">
+            Manage Bookings
+          </Link>
+        </div>
+
+        {loading ? (
+          <Card className="border-2 border-dashed border-gray-300 p-6 text-center font-bold text-gray-500 uppercase">
+            Loading booked services...
+          </Card>
+        ) : bookedServices.length === 0 ? (
+          <Card className="border-2 border-dashed border-gray-300 p-6 text-center font-bold text-gray-500 uppercase">
+            No booked services yet
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {bookedServices.map((service) => {
+              const start = new Date(service.start);
+              const end = new Date(start.getTime() + Number(service.duration) * 60 * 60 * 1000);
+              const isPast = end.getTime() < Date.now();
+              return (
+                <Card key={service.id} className="border-2 border-[#1a1a1a]">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                      <p className="font-black uppercase text-lg">{service.service}</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase">
+                        {service.plate} · {start.toLocaleDateString()} · {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-[#1a1a1a] text-white border-0 shadow-none">{service.status}</Badge>
+                      <Badge className={`${isPast ? 'bg-gray-300 text-[#1a1a1a]' : 'bg-blue text-white'} border-0 shadow-none`}>
+                        {isPast ? 'COMPLETED SLOT' : `BAY: ${service.bay}`}
+                      </Badge>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       {/* My Garage */}
       <section>

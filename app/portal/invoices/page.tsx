@@ -41,15 +41,18 @@ export default function InvoicesPage() {
         .order('created_at', { ascending: false });
 
       if (data) {
-        setInvoices(data.map((inv: any) => ({
-          id: inv.id,
-          plate: inv.work_orders?.plate || '—',
-          service: inv.work_orders?.type || 'Service',
-          date: new Date(inv.created_at).toLocaleDateString(),
-          amount: Number(inv.amount),
-          paid: inv.status === 'paid',
-          mechanic_id: inv.work_orders?.assigned_mechanic_id
-        })));
+        setInvoices(data.map((inv: any) => {
+          const workOrder = Array.isArray(inv.work_orders) ? inv.work_orders[0] : inv.work_orders;
+          return {
+            id: inv.id,
+            plate: workOrder?.plate || '—',
+            service: workOrder?.type || 'Service',
+            date: new Date(inv.created_at).toLocaleDateString(),
+            amount: Number(inv.amount),
+            paid: inv.status === 'paid',
+            mechanic_id: workOrder?.assigned_mechanic_id
+          };
+        }));
       }
       setLoading(false);
     }
