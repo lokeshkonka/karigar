@@ -15,6 +15,14 @@ export interface CarMeshProps {
 
 const CAMARO_MODEL_URL = '/models/chevrolet-camaro.fbx';
 
+function safeColor(input: string, fallback = '#7f8791') {
+  try {
+    return new THREE.Color(input);
+  } catch {
+    return new THREE.Color(fallback);
+  }
+}
+
 function buildMaterial(
   source: THREE.Material,
   meshName: string,
@@ -102,7 +110,7 @@ export function CarMesh({
   const rawModel = useFBX(CAMARO_MODEL_URL);
 
   const prepared = useMemo(() => {
-    const bodyColor = new THREE.Color(color);
+    const bodyColor = safeColor(color);
     const cloned = rawModel.clone(true);
 
     cloned.traverse((obj) => {
@@ -110,10 +118,6 @@ export function CarMesh({
 
       obj.castShadow = true;
       obj.receiveShadow = true;
-
-      if (obj.geometry) {
-        obj.geometry.computeVertexNormals();
-      }
 
       if (Array.isArray(obj.material)) {
         obj.material = obj.material.map((m) => buildMaterial(m, obj.name || '', bodyColor, wireframe));

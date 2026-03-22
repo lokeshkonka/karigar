@@ -26,6 +26,40 @@ function LoadingFallback() {
   );
 }
 
+function ModelLoadFallback({ color }: { color: string }) {
+  return (
+    <group>
+      <mesh position={[0, 0.62, 0]} castShadow>
+        <boxGeometry args={[1.8, 0.8, 4.2]} />
+        <meshStandardMaterial color={color} metalness={0.72} roughness={0.25} />
+      </mesh>
+      <mesh position={[0, 0.15, 0]}>
+        <boxGeometry args={[1.9, 0.18, 4.3]} />
+        <meshStandardMaterial color="#111" roughness={0.82} />
+      </mesh>
+    </group>
+  );
+}
+
+class SceneErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; fallback: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
 export function VehicleModelViewer({
   color = '#888888',
   scaleX = 1,
@@ -39,6 +73,7 @@ export function VehicleModelViewer({
     <div className={`relative w-full h-full ${className}`}>
       <Canvas
         shadows
+        dpr={[1, 1.5]}
         camera={{ position: [6.2, 2.5, 7.5], fov: 36 }}
         gl={{
           antialias: true,
@@ -53,10 +88,10 @@ export function VehicleModelViewer({
           <ambientLight intensity={0.3} color="#d8e4ff" />
           <directionalLight
             position={[8, 12, 8]}
-            intensity={2.1}
+            intensity={1.9}
             color="#fff7ea"
             castShadow
-            shadow-mapSize={[2048, 2048]}
+            shadow-mapSize={[1024, 1024]}
             shadow-camera-near={0.5}
             shadow-camera-far={30}
             shadow-camera-left={-10}
@@ -69,14 +104,16 @@ export function VehicleModelViewer({
 
           <Environment preset="city" />
 
-          <CarMesh color={color} scaleX={scaleX} scaleZ={scaleZ} autoRotate={autoRotate} />
+          <SceneErrorBoundary fallback={<ModelLoadFallback color={color} />}>
+            <CarMesh color={color} scaleX={scaleX} scaleZ={scaleZ} autoRotate={autoRotate} />
+          </SceneErrorBoundary>
 
           <ContactShadows
             position={[0, -0.001, 0]}
-            opacity={0.34}
-            scale={18}
-            blur={2.8}
-            far={7}
+            opacity={0.28}
+            scale={15}
+            blur={2}
+            far={6}
             color="#000000"
           />
 
