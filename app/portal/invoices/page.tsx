@@ -67,7 +67,7 @@ export default function InvoicesPage() {
             date: new Date(inv.created_at).toLocaleDateString(),
             amount: Number(inv.amount),
             paid: inv.status === 'paid',
-            mechanic_id: workOrder?.assigned_mechanic_id
+            mechanic_id: workOrder?.assigned_mechanic_id ?? undefined
           };
         }));
       }
