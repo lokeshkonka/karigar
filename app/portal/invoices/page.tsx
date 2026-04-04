@@ -11,6 +11,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Loader2 } from 'lucide-react';
 
+const PAYOUT_SHARE = 0.4;
+
 interface Invoice {
   id: string;
   plate: string;
@@ -19,6 +21,17 @@ interface Invoice {
   amount: number;
   paid: boolean;
   mechanic_id?: string;
+}
+
+interface InvoiceQueryRow {
+  id: string;
+  amount: number | string;
+  status: string;
+  created_at: string;
+  work_orders:
+    | { plate?: string | null; type?: string | null; assigned_mechanic_id?: string | null }
+    | { plate?: string | null; type?: string | null; assigned_mechanic_id?: string | null }[]
+    | null;
 }
 
 export default function InvoicesPage() {
@@ -30,18 +43,22 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     async function fetchInvoices() {
-      if (!user?.email) return;
+      if (!user?.email) {
+        setInvoices([]);
+        setLoading(false);
+        return;
+      }
       const { data: customer } = await supabase.from('customers').select('id').eq('email', user.email).maybeSingle();
       if (!customer) { setLoading(false); return; }
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('invoices')
         .select('*, work_orders(plate, type, assigned_mechanic_id)')
         .eq('customer_id', customer.id)
         .order('created_at', { ascending: false });
 
       if (data) {
-        setInvoices(data.map((inv: any) => {
+        setInvoices((data as InvoiceQueryRow[]).map((inv) => {
           const workOrder = Array.isArray(inv.work_orders) ? inv.work_orders[0] : inv.work_orders;
           return {
             id: inv.id,
@@ -70,11 +87,30 @@ export default function InvoicesPage() {
     }
 
     // 1. Optimistic backend update for mock payment
-    await supabase.from('invoices').update({ status: 'paid' }).eq('id', id);
+    const { data: updatedRows, error: updateError } = await supabase
+      .from('invoices')
+      .update({ status: 'paid' })
+      .eq('id', id)
+      .neq('status', 'paid')
+      .select('id');
+
+    if (updateError) {
+      toast.error('Payment could not be recorded');
+      setIsProcessing(false);
+      return;
+    }
+
+    if (!updatedRows || updatedRows.length === 0) {
+      setInvoices(prev => prev.map(row => row.id === id ? { ...row, paid: true } : row));
+      setConfirmId(null);
+      toast('This invoice was already paid.');
+      setIsProcessing(false);
+      return;
+    }
 
     // 2. Generate Technician Payout (40%)
     if (inv.mechanic_id) {
-      const payoutAmount = Math.floor(inv.amount * 0.40);
+      const payoutAmount = Math.floor(inv.amount * PAYOUT_SHARE);
       await supabase.from('payouts').insert({
         staff_id: inv.mechanic_id,
         amount: payoutAmount,

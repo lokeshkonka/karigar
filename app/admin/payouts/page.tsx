@@ -9,18 +9,43 @@ import { Badge } from '@/components/ui/Badge';
 import { DollarSign, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const PAYOUT_SHARE = 0.4;
+
+interface StaffSummary {
+  id: string;
+  name: string;
+  role: string;
+}
+
+interface InvoiceSummary {
+  amount: number | string | null;
+  status: string | null;
+}
+
+interface CompletedJob {
+  id: string;
+  type: string;
+  created_at: string;
+  invoices: InvoiceSummary | InvoiceSummary[] | null;
+  vehicles: { plate: string | null } | { plate: string | null }[] | null;
+}
+
+interface PayoutLedgerRow {
+  id: string;
+  amount: number | string;
+  status: string;
+  created_at: string;
+  staff_profiles?: { name?: string | null } | { name?: string | null }[] | null;
+}
+
 export default function AdminPayoutsPage() {
-  const [staffList, setStaffList] = useState<any[]>([]);
-  const [selectedStaff, setSelectedStaff] = useState<any>(null);
-  const [completedJobs, setCompletedJobs] = useState<any[]>([]);
-  const [payouts, setPayouts] = useState<any[]>([]);
+  const [staffList, setStaffList] = useState<StaffSummary[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<StaffSummary | null>(null);
+  const [completedJobs, setCompletedJobs] = useState<CompletedJob[]>([]);
+  const [payouts, setPayouts] = useState<PayoutLedgerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [payoutAmount, setPayoutAmount] = useState('');
   const [recommendedPayout, setRecommendedPayout] = useState(0);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   async function fetchData() {
     setLoading(true);
@@ -44,7 +69,7 @@ export default function AdminPayoutsPage() {
 
   async function loadStaffJobs(staffId: string) {
     const staff = staffList.find(s => s.id === staffId);
-    setSelectedStaff(staff);
+    setSelectedStaff(staff || null);
     
     // Fetch completed/ready work orders for this staff
     const { data: jobs } = await supabase
@@ -58,22 +83,29 @@ export default function AdminPayoutsPage() {
       .in('status', ['READY', 'DELIVERED'])
       .order('updated_at', { ascending: false });
 
-    const safeJobs = jobs || [];
+    const safeJobs = (jobs || []) as CompletedJob[];
     setCompletedJobs(safeJobs);
 
-    // Recommend payout as 30% of paid invoice revenue for these completed jobs.
-    const paidRevenue = safeJobs.reduce((sum: number, job: any) => {
+    // Recommend payout as 40% of paid invoice revenue for these completed jobs.
+    const paidRevenue = safeJobs.reduce((sum: number, job) => {
       const invoiceRows = Array.isArray(job.invoices) ? job.invoices : job.invoices ? [job.invoices] : [];
       const paidForJob = invoiceRows
-        .filter((invoice: any) => invoice.status === 'paid')
-        .reduce((acc: number, invoice: any) => acc + (Number(invoice.amount) || 0), 0);
+        .filter((invoice) => invoice.status === 'paid')
+        .reduce((acc: number, invoice) => acc + (Number(invoice.amount) || 0), 0);
       return sum + paidForJob;
     }, 0);
 
-    const recommended = Math.max(0, Math.round(paidRevenue * 0.3));
+    const recommended = Math.max(0, Math.round(paidRevenue * PAYOUT_SHARE));
     setRecommendedPayout(recommended);
     setPayoutAmount(recommended.toString());
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchData();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleIssuePayout = async () => {
     if (!selectedStaff || !payoutAmount || Number(payoutAmount) <= 0) {
@@ -189,8 +221,8 @@ export default function AdminPayoutsPage() {
                     const vehicle = Array.isArray(job.vehicles) ? job.vehicles[0] : job.vehicles;
                     const invoiceRows = Array.isArray(job.invoices) ? job.invoices : job.invoices ? [job.invoices] : [];
                     const paidRevenue = invoiceRows
-                      .filter((invoice: any) => invoice.status === 'paid')
-                      .reduce((sum: number, invoice: any) => sum + (Number(invoice.amount) || 0), 0);
+                      .filter((invoice) => invoice.status === 'paid')
+                      .reduce((sum: number, invoice) => sum + (Number(invoice.amount) || 0), 0);
                     return (
                       <div key={job.id} className="border-2 border-dashed border-gray-300 p-3 flex items-center justify-between gap-3">
                         <div>
@@ -225,7 +257,7 @@ export default function AdminPayoutsPage() {
                   {payouts.map(p => (
                     <tr key={p.id} className="border-b-2 border-dashed border-gray-200 hover:bg-cream">
                       <td className="py-3 px-4 font-bold text-sm text-gray-600">{new Date(p.created_at).toLocaleDateString()}</td>
-                      <td className="py-3 px-4 font-black text-[#1a1a1a] uppercase">{p.staff_profiles?.name || 'Unknown'}</td>
+                      <td className="py-3 px-4 font-black text-[#1a1a1a] uppercase">{(Array.isArray(p.staff_profiles) ? p.staff_profiles[0] : p.staff_profiles)?.name || 'Unknown'}</td>
                       <td className="py-3 px-4 font-black font-mono text-green-600">₹{p.amount}</td>
                       <td className="py-3 px-4 text-center">
                         {p.status === 'pending' ? (

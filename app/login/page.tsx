@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const { user, isLoading, setUser } = useAuthStore();
+  const { user, isLoading } = useAuthStore();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +56,7 @@ export default function LoginPage() {
 
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim().toLowerCase(),
       password,
     });
     setLoading(false);
@@ -68,14 +68,6 @@ export default function LoginPage() {
 
     if (data.session) {
       toast.success('Login Successful');
-      const role = data.session.user.user_metadata?.role || 'CUSTOMER';
-      if (role === 'CUSTOMER') {
-        router.push('/portal/home');
-      } else if (role === 'TECHNICIAN') {
-        router.push('/staff/dashboard');
-      } else {
-        router.push('/admin/dashboard');
-      }
     }
   };
 

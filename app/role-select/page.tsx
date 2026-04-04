@@ -25,23 +25,25 @@ export default function RoleSelectPage() {
   const chooseCustomer = async () => {
     if (!user) { router.replace('/login'); return; }
     setChecking(true);
+    const normalizedEmail = user.email.trim().toLowerCase();
     
     // Auto-create customer record if it doesn't exist
     const { data: existingCustomer } = await supabase
       .from('customers')
       .select('id')
-      .eq('email', user.email)
+      .eq('email', normalizedEmail)
       .maybeSingle();
 
     if (!existingCustomer) {
       await supabase.from('customers').insert({
         user_id: user.id,
-        email: user.email,
+        email: normalizedEmail,
         name: user.name || 'New Customer',
         phone: 'N/A'
       });
     }
 
+    setUser({ ...user, role: 'CUSTOMER' });
     setChecking(false);
     toast.success('Welcome to the Garage!');
     router.replace('/portal/home');
@@ -50,19 +52,21 @@ export default function RoleSelectPage() {
   const chooseWorker = async () => {
     if (!user) { router.replace('/login'); return; }
     setChecking(true);
+    const normalizedEmail = user.email.trim().toLowerCase();
 
     const { data } = await supabase
       .from('staff_profiles')
       .select('id, role, name, bay_number')
-      .eq('email', user.email)
+      .eq('email', normalizedEmail)
       .maybeSingle();
 
     setChecking(false);
 
     if (data) {
-      setUser({ ...user, role: data.role as any });
+      const role = data.role as 'OWNER' | 'MANAGER' | 'TECHNICIAN';
+      setUser({ ...user, role });
       toast.success(`Welcome, ${data.name}! Clocking in to ${data.bay_number}`);
-      router.replace('/staff/dashboard');
+      router.replace(role === 'OWNER' || role === 'MANAGER' ? '/admin/dashboard' : '/staff/dashboard');
     } else {
       toast.error('Your email is not registered as a staff member. Contact the admin.');
     }
@@ -84,7 +88,7 @@ export default function RoleSelectPage() {
             className="w-full py-6 bg-white border-4 border-[#1a1a1a] shadow-[4px_4px_0px_#1a1a1a] font-black uppercase tracking-widest text-lg flex flex-col items-center gap-2 hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group"
           >
             <User size={36} strokeWidth={2} className="text-blue group-hover:scale-110 transition-transform" />
-            I'm a Customer
+            I am a Customer
             <span className="text-xs font-bold text-gray-500 normal-case tracking-normal">Track my vehicle service</span>
           </button>
 
@@ -97,7 +101,7 @@ export default function RoleSelectPage() {
               ? <Loader2 size={36} strokeWidth={2} className="animate-spin" />
               : <Wrench size={36} strokeWidth={2} className="group-hover:scale-110 transition-transform" />
             }
-            {checking ? 'Verifying credentials...' : "I'm a Workshop Staff"}
+            {checking ? 'Verifying credentials...' : 'I am Workshop Staff'}
             <span className="text-xs font-bold text-[#1a1a1a]/60 normal-case tracking-normal">Mechanics & Technicians only</span>
           </button>
         </div>

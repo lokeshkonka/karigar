@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -9,19 +9,33 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { DollarSign, Clock, CheckCircle, FilePlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const PAYOUT_SHARE = 0.4;
+
+interface PayoutRow {
+  id: string;
+  amount: number | string;
+  status: string;
+  created_at: string;
+}
+
+interface StaffProfile {
+  id: string;
+  name: string;
+}
+
+interface WorkOrderRevenueRow {
+  invoices: { amount: number | string | null; status: string | null } | { amount: number | string | null; status: string | null }[] | null;
+}
+
 export default function StaffPayoutsPage() {
   const { user } = useAuthStore();
-  const [payouts, setPayouts] = useState<any[]>([]);
+  const [payouts, setPayouts] = useState<PayoutRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, pending: 0, thisMonth: 0 });
   const [unclaimedRevenue, setUnclaimedRevenue] = useState(0);
-  const [staffProfile, setStaffProfile] = useState<any>(null);
+  const [staffProfile, setStaffProfile] = useState<StaffProfile | null>(null);
 
-  useEffect(() => {
-    fetchPayouts();
-  }, [user]);
-
-  async function fetchPayouts() {
+  const fetchPayouts = useCallback(async () => {
     if (!user?.email) return;
     setLoading(true);
 
@@ -43,7 +57,7 @@ export default function StaffPayoutsPage() {
       setPayouts(payoutData);
       let tot = 0, pen = 0, curr = 0;
       const today = new Date();
-      payoutData.forEach(p => {
+      payoutData.forEach((p: PayoutRow) => {
         const amt = Number(p.amount) || 0;
         if (p.status === 'paid') tot += amt;
         if (p.status === 'pending') pen += amt;
@@ -54,7 +68,7 @@ export default function StaffPayoutsPage() {
       });
       setStats({ total: tot, pending: pen, thisMonth: curr });
 
-      // Calculate unclaimed completed invoice revenue as real 30% share minus already raised payouts.
+      // Calculate unclaimed completed invoice revenue as real 40% share minus already raised payouts.
       const { data: woData } = await supabase
         .from('work_orders')
         .select('id, invoices(amount, status)')
@@ -63,18 +77,18 @@ export default function StaffPayoutsPage() {
 
       if (woData) {
         let paidInvoiceRevenue = 0;
-        woData.forEach((wo) => {
+        (woData as WorkOrderRevenueRow[]).forEach((wo) => {
           if (Array.isArray(wo.invoices)) {
-            wo.invoices.forEach((inv: any) => {
+            wo.invoices.forEach((inv) => {
               if (inv.status === 'paid') paidInvoiceRevenue += Number(inv.amount) || 0;
             });
           } else if (wo.invoices) {
-            const inv = wo.invoices as any;
+            const inv = wo.invoices;
             if (inv.status === 'paid') paidInvoiceRevenue += Number(inv.amount) || 0;
           }
         });
 
-        const eligibleShare = paidInvoiceRevenue * 0.3;
+        const eligibleShare = paidInvoiceRevenue * PAYOUT_SHARE;
         const alreadyIssued = tot + pen;
         const remaining = eligibleShare - alreadyIssued;
         setUnclaimedRevenue(remaining > 0 ? remaining : 0);
@@ -87,7 +101,14 @@ export default function StaffPayoutsPage() {
       setUnclaimedRevenue(0);
     }
     setLoading(false);
-  }
+  }, [user]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchPayouts();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchPayouts]);
 
   const handleCreateReceipt = async () => {
     if (unclaimedRevenue <= 0) return toast.error("No unclaimed revenue available.");
@@ -137,7 +158,7 @@ export default function StaffPayoutsPage() {
           <div>
             <span className="font-black uppercase tracking-widest text-sm text-gray-500 block mb-2">Unclaimed Revenue Check</span>
             <p className="text-sm font-bold text-gray-700 max-w-lg">
-              You have approximately <span className="text-green-600 font-mono font-black">₹{unclaimedRevenue.toFixed(2)}</span> in recent verified invoices that hasn't been added to a payout cycle yet.
+              You have approximately <span className="text-green-600 font-mono font-black">₹{unclaimedRevenue.toFixed(2)}</span> in recent verified invoices that have not been added to a payout cycle yet.
             </p>
           </div>
           <Button onClick={handleCreateReceipt} className="bg-blue hover:bg-blue-600 text-white font-black uppercase tracking-widest border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] transition-all hover:translate-x-[2px] hover:translate-y-[2px] py-6 px-6 flex items-center gap-3 shrink-0">

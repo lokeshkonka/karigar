@@ -3,14 +3,33 @@
 import React, { useState, useEffect } from 'react';
 import { Loader } from '@/components/ui/Loader';
 import { supabase } from '@/lib/supabase';
-import { Search, Plus, Loader2, ChevronDown, ChevronRight, X, Car, QrCode } from 'lucide-react';
+import { Search, Plus, ChevronDown, ChevronRight, X, Car, QrCode } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 const EMPTY_FORM = { name: '', phone: '', email: '' };
 
+interface VehicleSummary {
+  id: string;
+  make: string;
+  model: string;
+  plate: string;
+  color: string | null;
+}
+
+interface CustomerRow {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  tier: string | null;
+  vehicles?: VehicleSummary[];
+}
+
+type CustomerFormKey = keyof typeof EMPTY_FORM;
+
 export default function StaffCustomersPage() {
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<CustomerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -29,15 +48,25 @@ export default function StaffCustomersPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchCustomers(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchCustomers();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAdd = async () => {
-    if (!form.name) { toast.error('Customer name required'); return; }
+    const payload = {
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim().toLowerCase(),
+    };
+    if (!payload.name) { toast.error('Customer name required'); return; }
     setSaving(true);
-    const { error } = await supabase.from('customers').insert([form]);
+    const { error } = await supabase.from('customers').insert([payload]);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(`${form.name} added!`);
+    toast.success(`${payload.name} added!`);
     setShowModal(false);
     setForm(EMPTY_FORM);
     fetchCustomers();
@@ -116,7 +145,7 @@ export default function StaffCustomersPage() {
                       <p className="text-gray-500 font-bold text-sm italic py-2">No vehicles registered yet.</p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {c.vehicles.map((v: any) => (
+                        {c.vehicles.map((v) => (
                           <div key={v.id} className="border-2 border-dashed border-[#1a1a1a] p-4 flex items-center justify-between bg-cream">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 border-2 border-[#1a1a1a] flex items-center justify-center shadow-[2px_2px_0_#1a1a1a]" style={{ backgroundColor: v.color || '#333' }}>
@@ -164,7 +193,7 @@ export default function StaffCustomersPage() {
               ].map(f => (
                 <div key={f.key}>
                   <label className="block text-xs font-black uppercase text-gray-600 mb-1">{f.label}</label>
-                  <input value={(form as any)[f.key]} type={f.type} placeholder={f.placeholder}
+                  <input value={form[f.key as CustomerFormKey]} type={f.type} placeholder={f.placeholder}
                     onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                     className="w-full p-3 bg-white border-2 border-[#1a1a1a] text-[#1a1a1a] font-bold focus:outline-none focus:ring-2 focus:ring-electricYellow" />
                 </div>

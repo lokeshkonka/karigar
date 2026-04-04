@@ -43,7 +43,7 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/role-select`,
       },
     });
     if (error) {
@@ -55,9 +55,11 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPlate = plate.trim().toUpperCase();
 
     const { data: authData, error } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
         data: { name, phone, role: 'CUSTOMER' }
@@ -73,22 +75,34 @@ export default function RegisterPage() {
     // Insert customer row directly
     const { data: customerData, error: custErr } = await supabase.from('customers').insert({
       user_id: authData.user.id,
-      email: email,
-      name: name,
-      phone: phone
+      email: normalizedEmail,
+      name: name.trim(),
+      phone: phone.trim()
     }).select().single();
 
     if (customerData && !custErr) {
       // Also register their first vehicle
       await supabase.from('vehicles').insert({
         customer_id: customerData.id,
-        make, model, year: parseInt(year) || 2020, plate, fuel, color: '#1a1a1a'
+        make: make.trim(),
+        model: model.trim(),
+        year: parseInt(year) || 2020,
+        plate: normalizedPlate,
+        fuel,
+        color: '#1a1a1a'
       });
     }
 
     setLoading(false);
-    toast.success('Account & Vehicle created successfully!');
-    router.replace('/portal/home');
+
+    if (authData.session) {
+      toast.success('Account & Vehicle created successfully!');
+      router.replace('/portal/home');
+      return;
+    }
+
+    toast.success('Account created. Verify your email, then sign in.');
+    router.replace('/login');
   };
 
   return (
@@ -101,7 +115,7 @@ export default function RegisterPage() {
         <h2 className="text-3xl font-black uppercase text-[#1a1a1a] mb-2 border-b-4 border-[#1a1a1a] pb-2">
           New Customer Registration
         </h2>
-        <p className="font-bold mb-8 text-gray-600">Create an account to track your vehicle's service history.</p>
+        <p className="font-bold mb-8 text-gray-600">Create an account to track your vehicle service history.</p>
 
         <form onSubmit={handleRegister} className="flex flex-col gap-8">
           

@@ -10,9 +10,27 @@ import { Badge } from '@/components/ui/Badge';
 import { Printer, Mail, Send, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
+const PAYOUT_SHARE = 0.4;
+
+interface InvoiceDetails {
+  id: string;
+  amount: number | string | null;
+  status: string;
+  created_at: string;
+  due_date: string | null;
+  work_orders?: {
+    plate?: string | null;
+    customer_name?: string | null;
+    type?: string | null;
+    assigned_mechanic_id?: string | null;
+    vehicles?: { make?: string | null; model?: string | null } | { make?: string | null; model?: string | null }[] | null;
+    customers?: { phone?: string | null } | { phone?: string | null }[] | null;
+  } | null;
+}
+
 export default function InvoiceDetail() {
   const { id } = useParams();
-  const [invoice, setInvoice] = useState<any>(null);
+  const [invoice, setInvoice] = useState<InvoiceDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -38,10 +56,12 @@ export default function InvoiceDetail() {
   const gst = total - subtotal;
   
   const customerName = invoice.work_orders?.customer_name || 'Walk-in Customer';
-  const customerPhone = invoice.work_orders?.customers?.phone || 'No Phone';
+  const customerContact = Array.isArray(invoice.work_orders?.customers) ? invoice.work_orders?.customers[0] : invoice.work_orders?.customers;
+  const vehicleInfo = Array.isArray(invoice.work_orders?.vehicles) ? invoice.work_orders?.vehicles[0] : invoice.work_orders?.vehicles;
+  const customerPhone = customerContact?.phone || 'No Phone';
   const plate = invoice.work_orders?.plate || '—';
-  const make = invoice.work_orders?.vehicles?.make || '—';
-  const model = invoice.work_orders?.vehicles?.model || '—';
+  const make = vehicleInfo?.make || '—';
+  const model = vehicleInfo?.model || '—';
   
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
@@ -63,13 +83,23 @@ export default function InvoiceDetail() {
             onClick={async () => {
               if (isProcessing || invoice.status === 'paid') return;
               setIsProcessing(true);
-              const { error } = await supabase.from('invoices').update({ status: 'paid' }).eq('id', invoice.id);
+              const { data: updatedRows, error } = await supabase
+                .from('invoices')
+                .update({ status: 'paid' })
+                .eq('id', invoice.id)
+                .neq('status', 'paid')
+                .select('id');
               if (!error) {
+                if (!updatedRows || updatedRows.length === 0) {
+                  setInvoice({ ...invoice, status: 'paid' });
+                  setIsProcessing(false);
+                  return;
+                }
                 const mechanicId = invoice.work_orders?.assigned_mechanic_id;
                 if (mechanicId) {
                   await supabase.from('payouts').insert({
                     staff_id: mechanicId,
-                    amount: Math.floor(Number(invoice.amount) * 0.40),
+                    amount: Math.floor(Number(invoice.amount) * PAYOUT_SHARE),
                     status: 'pending'
                   });
                 }

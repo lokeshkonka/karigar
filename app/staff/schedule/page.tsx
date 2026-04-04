@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Card } from '@/components/ui/Card';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { ChevronLeft, ChevronRight, Calendar as CalIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -10,7 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 const START_HOUR = 8;
 const END_HOUR = 20;
 const SLOT_HEIGHT = 90;
-const BAYS = ['Bay 1', 'Bay 2', 'Bay 3', 'Bay 4', 'Bay 5'];
+const BAYS = ['Bay 01', 'Bay 02', 'Bay 03', 'Bay 04', 'Bay 05'];
 const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => START_HOUR + i);
 
 function formatHourLabel(hour24: number) {
@@ -25,10 +24,40 @@ function formatRange(startIso: string, durationHours: number) {
   return `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })} - ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
 }
 
+function normalizeBayLabel(value: string | null | undefined) {
+  if (!value) return '';
+  const match = value.match(/\d+/);
+  return match ? `Bay ${match[0].padStart(2, '0')}` : value.trim();
+}
+
+interface AppointmentRow {
+  id: string;
+  bay: string;
+  start_time: string;
+  durationHours: number;
+  startOffsetHours: number;
+  color: string;
+  plate: string;
+  serviceType: string;
+}
+
+interface AppointmentQueryRow {
+  id: string;
+  bay: string | null;
+  start_time: string;
+  duration_hours: number | null;
+  title: string | null;
+  type: string | null;
+  work_orders:
+    | { assigned_mechanic_id: string | null; plate: string | null; type: string | null }
+    | { assigned_mechanic_id: string | null; plate: string | null; type: string | null }[]
+    | null;
+}
+
 export default function StaffSchedulePage() {
   const { user } = useAuthStore();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const changeDate = (days: number) => {
@@ -37,12 +66,12 @@ export default function StaffSchedulePage() {
     setCurrentDate(next);
   };
 
-  useEffect(() => {
-    fetchAppointments();
-  }, [currentDate, user]);
-
-  async function fetchAppointments() {
-    if (!user?.email) return;
+  const fetchAppointments = useCallback(async () => {
+    if (!user?.email) {
+      setAppointments([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
 
     const { data: profile } = await supabase.from('staff_profiles').select('id').eq('email', user.email).maybeSingle();
@@ -64,13 +93,13 @@ export default function StaffSchedulePage() {
       .lte('start_time', end.toISOString())
       .order('start_time', { ascending: true });
 
-    const filtered = (data || []).filter((appointment: any) => {
+    const filtered = ((data || []) as AppointmentQueryRow[]).filter((appointment) => {
       const workOrder = Array.isArray(appointment.work_orders) ? appointment.work_orders[0] : appointment.work_orders;
       return workOrder?.assigned_mechanic_id === profile.id;
     });
 
     setAppointments(
-      filtered.map((appointment: any) => {
+      filtered.map((appointment) => {
         const startDate = new Date(appointment.start_time);
         const startOffsetHours = startDate.getHours() + startDate.getMinutes() / 60 - START_HOUR;
         const durationHours = Number(appointment.duration_hours) > 0 ? Number(appointment.duration_hours) : 1;
@@ -88,6 +117,7 @@ export default function StaffSchedulePage() {
           color,
           durationHours,
           startOffsetHours,
+          bay: normalizeBayLabel(appointment.bay),
           plate: workOrder?.plate || 'N/A',
           serviceType: workOrder?.type || appointment.title || 'Service',
         };
@@ -95,7 +125,14 @@ export default function StaffSchedulePage() {
     );
 
     setLoading(false);
-  }
+  }, [currentDate, user]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchAppointments();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchAppointments]);
 
   const totalGridHeight = HOURS.length * SLOT_HEIGHT;
 

@@ -10,14 +10,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setLoading } = useAuthStore();
 
   async function resolveRole(email: string, userId: string): Promise<UserRole> {
+    const normalizedEmail = email.trim().toLowerCase();
     // 1. Check if the email matches admin override
-    if (ADMIN_EMAIL && email === ADMIN_EMAIL) return 'OWNER';
+    if (ADMIN_EMAIL && normalizedEmail === ADMIN_EMAIL.trim().toLowerCase()) return 'OWNER';
 
     // 2. Query staff_profiles table
     const { data } = await supabase
       .from('staff_profiles')
       .select('id, role, user_id')
-      .eq('email', email)
+      .eq('email', normalizedEmail)
       .maybeSingle();
 
     if (data) {
@@ -26,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await supabase
           .from('staff_profiles')
           .update({ user_id: userId })
-          .eq('email', email);
+          .eq('email', normalizedEmail);
       }
       return data.role as UserRole;
     }

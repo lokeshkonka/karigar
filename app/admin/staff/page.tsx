@@ -5,7 +5,7 @@ import { Loader } from '@/components/ui/Loader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { supabase } from '@/lib/supabase';
-import { Plus, Trash2, X, Users, Activity, Loader2 } from 'lucide-react';
+import { Plus, Trash2, X, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface StaffProfile {
@@ -40,15 +40,26 @@ export default function StaffPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchStaff(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchStaff();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAddStaff = async () => {
-    if (!form.name || !form.email) { toast.error('Name and email are required'); return; }
+    const payload = {
+      ...form,
+      name: form.name.trim(),
+      email: form.email.trim().toLowerCase(),
+      bay_number: form.bay_number.trim() || 'Bay 01',
+    };
+    if (!payload.name || !payload.email) { toast.error('Name and email are required'); return; }
     setSaving(true);
-    const { error } = await supabase.from('staff_profiles').insert([form]);
+    const { error } = await supabase.from('staff_profiles').insert([payload]);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(`${form.name} added! They can now log in with ${form.email}`);
+    toast.success(`${payload.name} added! They can now log in with ${payload.email}`);
     setShowModal(false);
     setForm(EMPTY_FORM);
     fetchStaff();
