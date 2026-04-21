@@ -9,6 +9,7 @@ import {
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { supabase } from '@/lib/supabase';
+import { withClientCache } from '@/lib/clientCache';
 import { MapPin, User, Wrench, AlertTriangle, CheckCircle2, Clock, X, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { CarMeshProps } from '@/components/3d/CarMesh';
@@ -325,11 +326,18 @@ export default function GarageMapPage() {
 
   // ── Data load (unchanged) ──────────────────────────────────────────────
   useEffect(() => {
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     async function load() {
-      const { data: woData } = await supabase
-        .from('work_orders')
-        .select(`id, status, type, priority, plate, assigned_mechanic_id, vehicles (make, model, color, scan_3d_data), appointments (bay), staff_profiles (name)`)
-        .not('status', 'eq', 'DELIVERED');
+      const woData = await withClientCache('garage-map:work-orders', 4_000, async () => {
+        const { data, error } = await supabase
+          .from('work_orders')
+          .select(`id, status, type, priority, plate, assigned_mechanic_id, vehicles (make, model, color, scan_3d_data), appointments (bay), staff_profiles (name)`)
+          .not('status', 'eq', 'DELIVERED');
+        if (error) throw error;
+        return data || [];
+      });
 
       if (woData) {
         setBays(prev => prev.map(bay => {
@@ -357,9 +365,28 @@ export default function GarageMapPage() {
         }));
       }
     }
-    load();
-    const interval = setInterval(load, 5000);
-    return () => clearInterval(interval);
+
+    const poll = async () => {
+      if (!active) return;
+      if (document.visibilityState === 'visible') {
+        await load();
+      }
+      timer = setTimeout(poll, document.visibilityState === 'visible' ? 8_000 : 30_000);
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void load();
+      }
+    };
+
+    void poll();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      active = false;
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const counts = {
@@ -378,7 +405,7 @@ export default function GarageMapPage() {
           <h1 className="text-3xl lg:text-4xl font-black uppercase tracking-widest text-[#1a1a1a]">Garage Floor Plan</h1>
           <p className="text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Live · 6 Bays · Auto-refresh every 5s
+            Live · 6 Bays · Auto-refresh every few seconds
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -399,8 +426,10 @@ export default function GarageMapPage() {
 
         <Canvas
           shadows="soft"
+          dpr={[1, 1.15]}
           camera={{ position: [0, 15, 16], fov: 40, near: 0.1, far: 300 }}
-          gl={{ antialias: true, alpha: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+          gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
+          performance={{ min: 0.5 }}
           onPointerMissed={() => setSelectedBay(null)}
         >
           <color attach="background" args={['#ffffff']} />
@@ -412,7 +441,7 @@ export default function GarageMapPage() {
             position={[14, 24, 12]}
             intensity={1.8}
             castShadow
-            shadow-mapSize={[4096, 4096]}
+            shadow-mapSize={[2048, 2048]}
             shadow-camera-left={-16}
             shadow-camera-right={16}
             shadow-camera-top={14}

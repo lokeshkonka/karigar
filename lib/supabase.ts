@@ -30,6 +30,7 @@ const createSupabaseClient = (): SupabaseClient => {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      storageKey: 'karigar-auth',
     },
   });
 };

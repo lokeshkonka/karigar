@@ -15,6 +15,7 @@ const VehicleModelViewer = dynamic(
 );
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/lib/supabase';
+import { withClientCache } from '@/lib/clientCache';
 import toast from 'react-hot-toast';
 
 interface Vehicle {
@@ -46,11 +47,15 @@ export default function VehicleDetailPage() {
   useEffect(() => {
     setScanUrl(`${window.location.origin}/scan-intake/${id}?source=admin-qr`);
     async function fetchVehicle() {
-      const { data } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('id', id as string)
-        .maybeSingle();
+      const data = await withClientCache(`vehicle-detail:${id}`, 20_000, async () => {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('id', id as string)
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      });
       setVehicle(data);
       if (data?.fuel) setFuelDraft(data.fuel);
       await fetchHistory(data?.id || (id as string));
@@ -61,13 +66,17 @@ export default function VehicleDetailPage() {
       setHistoryLoading(true);
       setHistoryError(null);
 
-      const { data: woData, error: woError } = await supabase
-        .from('work_orders')
-        .select('id, type, status, priority, notes, created_at, updated_at, assigned_mechanic_id')
-        .eq('vehicle_id', vehicleId)
-        .order('created_at', { ascending: false });
+      const woData = await withClientCache(`vehicle-history:wo:${vehicleId}`, 12_000, async () => {
+        const { data, error } = await supabase
+          .from('work_orders')
+          .select('id, type, status, priority, notes, created_at, updated_at, assigned_mechanic_id')
+          .eq('vehicle_id', vehicleId)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
+      });
 
-      if (woError) {
+      if (!woData) {
         setHistoryError('Failed to load history data');
         setWorkOrders([]);
         setAppointments([]);
@@ -87,20 +96,28 @@ export default function VehicleDetailPage() {
         return;
       }
 
-      const [{ data: apptData, error: apptError }, { data: invoiceData, error: invoiceError }] = await Promise.all([
-        supabase
-          .from('appointments')
-          .select('id, work_order_id, bay, start_time, duration_hours, title, type, created_at')
-          .in('work_order_id', workOrderIds)
-          .order('start_time', { ascending: false }),
-        supabase
-          .from('invoices')
-          .select('id, work_order_id, amount, status, due_date, created_at')
-          .in('work_order_id', workOrderIds)
-          .order('created_at', { ascending: false }),
+      const [apptData, invoiceData] = await Promise.all([
+        withClientCache(`vehicle-history:appt:${vehicleId}`, 12_000, async () => {
+          const { data, error } = await supabase
+            .from('appointments')
+            .select('id, work_order_id, bay, start_time, duration_hours, title, type, created_at')
+            .in('work_order_id', workOrderIds)
+            .order('start_time', { ascending: false });
+          if (error) throw error;
+          return data || [];
+        }),
+        withClientCache(`vehicle-history:invoice:${vehicleId}`, 12_000, async () => {
+          const { data, error } = await supabase
+            .from('invoices')
+            .select('id, work_order_id, amount, status, due_date, created_at')
+            .in('work_order_id', workOrderIds)
+            .order('created_at', { ascending: false });
+          if (error) throw error;
+          return data || [];
+        }),
       ]);
 
-      if (apptError || invoiceError) {
+      if (!apptData || !invoiceData) {
         setHistoryError('Some timeline items could not be loaded');
       }
 
@@ -109,7 +126,10 @@ export default function VehicleDetailPage() {
       setHistoryLoading(false);
     }
 
-    fetchVehicle();
+    fetchVehicle().catch(() => {
+      toast.error('Unable to load vehicle details.');
+      setLoading(false);
+    });
   }, [id]);
 
   const carColor = vehicle?.color || '#888888';
@@ -265,7 +285,7 @@ export default function VehicleDetailPage() {
                 color={carColor}
                 scaleX={v.scan_3d_data?.scaleX || 1.0}
                 scaleZ={v.scan_3d_data?.scaleZ || 1.0}
-                autoRotate={true}
+                autoRotate={false}
                 info={[
                   { label: 'Vehicle', value: `${v.make} ${v.model}` },
                   { label: 'Year', value: String(v.year || '—') },

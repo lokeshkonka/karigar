@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Loader } from '@/components/ui/Loader';
 import { supabase } from '@/lib/supabase';
+import { withClientCache } from '@/lib/clientCache';
 import Link from 'next/link';
 import { QrCode, Loader2, Car, Camera } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 const VehicleModelViewer = dynamic(() => import('@/components/3d/VehicleModelViewer').then(mod => mod.VehicleModelViewer), { 
   ssr: false, 
   loading: () => <div className="h-full flex items-center justify-center bg-gray-100"><Loader /></div> 
@@ -33,15 +35,24 @@ export default function StaffScanPage() {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from('vehicles')
-        .select('id, plate, make, model, year, color, scan_3d_data')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      setVehicles(data || []);
+      const data = await withClientCache('staff-scan-vehicles', 30_000, async () => {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select('id, plate, make, model, year, color, scan_3d_data')
+          .order('created_at', { ascending: false })
+          .limit(20);
+        if (error) throw error;
+        return data || [];
+      });
+
+      setVehicles(data);
       setLoading(false);
     }
-    load();
+
+    load().catch(() => {
+      toast.error('Unable to load vehicles right now.');
+      setLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -80,6 +91,7 @@ export default function StaffScanPage() {
             color={selected.color || '#888888'}
             scaleX={selected.scan_3d_data?.scaleX || 1.0}
             scaleZ={selected.scan_3d_data?.scaleZ || 1.0}
+            autoRotate={false}
             info={[
               { label: 'Plate', value: selected.plate },
               { label: 'Year', value: String(selected.year || '—') },

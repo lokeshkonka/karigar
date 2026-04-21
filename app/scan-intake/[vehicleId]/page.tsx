@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Camera, ArrowRight, Check, Loader2, RotateCcw, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -53,8 +53,10 @@ export default function ScanIntakePage() {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
+      return true;
     } catch {
       toast.error('Camera access denied. Please allow camera permissions.');
+      return false;
     }
   }, []);
 
@@ -63,6 +65,12 @@ export default function ScanIntakePage() {
       (videoRef.current.srcObject as MediaStream).getTracks().forEach(t => t.stop());
     }
   }, []);
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
 
   const capture = useCallback((type: 'top' | 'side') => {
     const video = videoRef.current;
@@ -226,7 +234,12 @@ export default function ScanIntakePage() {
             </div>
 
             <button
-              onClick={async () => { setStep('top'); await startCamera(); }}
+              onClick={async () => {
+                const started = await startCamera();
+                if (started) {
+                  setStep('top');
+                }
+              }}
               className="w-full max-w-sm py-5 bg-electricYellow text-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[4px_4px_0px_#FFE500] font-black uppercase text-xl tracking-wider hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
             >
               <Camera size={24} className="inline mr-3 -mt-1" /> Begin Scan
@@ -362,7 +375,7 @@ export default function ScanIntakePage() {
                 color={extractedColor}
                 scaleX={carScale.scaleX}
                 scaleZ={carScale.scaleZ}
-                autoRotate={true}
+                autoRotate={false}
                 info={[
                   { label: 'Extracted Color', value: extractedColor.toUpperCase() },
                   { label: 'Width Scale', value: `${carScale.scaleX.toFixed(2)}x` },

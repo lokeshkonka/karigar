@@ -5,6 +5,19 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore, UserRole } from '@/store/useAuthStore';
 import { Toaster } from 'react-hot-toast';
 
+const AUTH_CACHE_KEY = 'karigar:auth-user';
+const ROLE_CACHE_KEY = 'karigar:role-cache';
+const ROLE_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+
+function safeJsonParse<T>(raw: string | null): T | null {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // Fallback for owner
   const { setUser, setLoading } = useAuthStore();
@@ -13,6 +26,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const normalizedEmail = email.trim().toLowerCase();
     // 1. Check if the email matches admin override
     if (ADMIN_EMAIL && normalizedEmail === ADMIN_EMAIL.trim().toLowerCase()) return 'OWNER';
+
+    if (typeof window !== 'undefined') {
+      const roleCache = safeJsonParse<Record<string, { role: UserRole; expiresAt: number }>>(
+        window.localStorage.getItem(ROLE_CACHE_KEY)
+      );
+      const cached = roleCache?.[normalizedEmail];
+      if (cached && cached.expiresAt > Date.now() && cached.role) {
+        return cached.role;
+      }
+    }
 
     // 2. Query staff_profiles table
     const { data } = await supabase
@@ -29,53 +52,111 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .update({ user_id: userId })
           .eq('email', normalizedEmail);
       }
-      return data.role as UserRole;
+      const role = data.role as UserRole;
+      if (typeof window !== 'undefined') {
+        const roleCache =
+          safeJsonParse<Record<string, { role: UserRole; expiresAt: number }>>(
+            window.localStorage.getItem(ROLE_CACHE_KEY)
+          ) || {};
+        roleCache[normalizedEmail] = { role, expiresAt: Date.now() + ROLE_CACHE_TTL_MS };
+        window.localStorage.setItem(ROLE_CACHE_KEY, JSON.stringify(roleCache));
+      }
+      return role;
     }
 
     // 4. Default to customer
     return 'CUSTOMER';
   }
 
+  function cacheUser(user: {
+    id: string;
+    email: string;
+    role: UserRole;
+    name: string;
+    avatar_url?: string;
+  } | null) {
+    if (typeof window === 'undefined') return;
+    if (!user) {
+      window.localStorage.removeItem(AUTH_CACHE_KEY);
+      return;
+    }
+    window.localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(user));
+  }
+
   useEffect(() => {
+    let mounted = true;
+
+    const hydrateFromCache = () => {
+      if (typeof window === 'undefined') return;
+      const parsed = safeJsonParse<{
+        id: string;
+        email: string;
+        role: UserRole;
+        name: string;
+        avatar_url?: string;
+      }>(window.localStorage.getItem(AUTH_CACHE_KEY));
+      if (!parsed) return;
+      setUser(parsed);
+      setLoading(false);
+    };
+
+    const setUserFromSession = async (session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session']) => {
+      if (!mounted) return;
+      if (session?.user) {
+        const role = await resolveRole(session.user.email!, session.user.id);
+        if (!mounted) return;
+        const nextUser = {
+          id: session.user.id,
+          email: session.user.email!,
+          role,
+          name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+          avatar_url: session.user.user_metadata?.avatar_url,
+        };
+        setUser(nextUser);
+        cacheUser(nextUser);
+      } else {
+        setUser(null);
+        cacheUser(null);
+      }
+      setLoading(false);
+    };
+
+    hydrateFromCache();
+
     supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      if (!mounted) return;
       if (error) {
         console.error('Session error:', error);
-        setUser(null);
+        setLoading(false);
         return;
       }
-
-      if (session?.user) {
-        const role = await resolveRole(session.user.email!, session.user.id);
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-          role,
-          name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-          avatar_url: session.user.user_metadata?.avatar_url,
-        });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
+      await setUserFromSession(session);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const role = await resolveRole(session.user.email!, session.user.id);
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-          role,
-          name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-          avatar_url: session.user.user_metadata?.avatar_url,
-        });
-      } else {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+      if (event === 'SIGNED_OUT') {
         setUser(null);
+        cacheUser(null);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+      await setUserFromSession(session);
     });
 
-    return () => { subscription.unsubscribe(); };
+    const refreshOnFocus = async () => {
+      if (document.visibilityState === 'visible') {
+        await supabase.auth.refreshSession();
+      }
+    };
+
+    document.addEventListener('visibilitychange', refreshOnFocus);
+
+    return () => {
+      mounted = false;
+      document.removeEventListener('visibilitychange', refreshOnFocus);
+      subscription.unsubscribe();
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
