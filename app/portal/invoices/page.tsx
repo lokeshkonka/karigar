@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Loader2 } from 'lucide-react';
+import { getCustomerByEmailCached } from '@/lib/customerClient';
 
 const PAYOUT_SHARE = 0.4;
 
@@ -35,46 +36,75 @@ interface InvoiceQueryRow {
 }
 
 export default function InvoicesPage() {
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuthStore();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    let active = true;
+
     async function fetchInvoices() {
+      if (authLoading) return;
+
       if (!user?.email) {
-        setInvoices([]);
-        setLoading(false);
+        if (active) {
+          setInvoices([]);
+          setLoading(false);
+        }
         return;
       }
-      const { data: customer } = await supabase.from('customers').select('id').eq('email', user.email).maybeSingle();
-      if (!customer) { setLoading(false); return; }
 
-      const { data } = await supabase
-        .from('invoices')
-        .select('*, work_orders(plate, type, assigned_mechanic_id)')
-        .eq('customer_id', customer.id)
-        .order('created_at', { ascending: false });
+      if (active) setLoading(true);
 
-      if (data) {
-        setInvoices((data as InvoiceQueryRow[]).map((inv) => {
-          const workOrder = Array.isArray(inv.work_orders) ? inv.work_orders[0] : inv.work_orders;
-          return {
-            id: inv.id,
-            plate: workOrder?.plate || '—',
-            service: workOrder?.type || 'Service',
-            date: new Date(inv.created_at).toLocaleDateString(),
-            amount: Number(inv.amount),
-            paid: inv.status === 'paid',
-            mechanic_id: workOrder?.assigned_mechanic_id ?? undefined
-          };
-        }));
+      try {
+        const customer = await getCustomerByEmailCached(user.email);
+
+        if (!customer) {
+          if (active) setInvoices([]);
+          return;
+        }
+
+        const { data, error: invoiceError } = await supabase
+          .from('invoices')
+          .select('*, work_orders(plate, type, assigned_mechanic_id)')
+          .eq('customer_id', customer.id)
+          .order('created_at', { ascending: false });
+
+        if (invoiceError) throw invoiceError;
+
+        if (active) {
+          setInvoices((data as InvoiceQueryRow[] || []).map((inv) => {
+            const workOrder = Array.isArray(inv.work_orders) ? inv.work_orders[0] : inv.work_orders;
+            return {
+              id: inv.id,
+              plate: workOrder?.plate || '—',
+              service: workOrder?.type || 'Service',
+              date: new Date(inv.created_at).toLocaleDateString(),
+              amount: Number(inv.amount),
+              paid: inv.status === 'paid',
+              mechanic_id: workOrder?.assigned_mechanic_id ?? undefined
+            };
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to fetch invoices:', error);
+        if (active) {
+          setInvoices([]);
+          toast.error('Unable to load invoices right now');
+        }
+      } finally {
+        if (active) setLoading(false);
       }
-      setLoading(false);
     }
+
     fetchInvoices();
-  }, [user]);
+
+    return () => {
+      active = false;
+    };
+  }, [authLoading, user?.email]);
 
   const handlePay = async (id: string) => {
     if (isProcessing) return;

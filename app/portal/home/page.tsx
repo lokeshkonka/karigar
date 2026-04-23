@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/lib/supabase';
+import { getCustomerByEmailCached } from '@/lib/customerClient';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
@@ -25,7 +26,7 @@ const STATUS_TO_STEP: Record<string, number> = {
 };
 
 export default function CustomerHomePage() {
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
   
   const [activeJob, setActiveJob] = useState<any>(null);
@@ -34,40 +35,62 @@ export default function CustomerHomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+
     async function loadDash() {
-      if (!user?.email) return;
+      if (authLoading) return;
 
-      const { data: customer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', user.email)
-        .maybeSingle();
-
-      if (!customer) {
-        setLoading(false);
+      if (!user?.email) {
+        if (active) {
+          setActiveJob(null);
+          setBookedServices([]);
+          setVehicles([]);
+          setLoading(false);
+        }
         return;
       }
 
-      // Fetch vehicles
-      const { data: vData } = await supabase.from('vehicles').select('*').eq('customer_id', customer.id);
-      if (vData) setVehicles(vData);
+      if (active) setLoading(true);
 
-      // Fetch active job
-      const { data: jobData } = await supabase
-        .from('work_orders')
-        .select(`*, vehicles(plate), appointments(bay)`)
-        .eq('customer_id', customer.id)
-        .neq('status', 'DELIVERED')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const customer = await getCustomerByEmailCached(user.email);
+
+      if (!customer) {
+        if (active) {
+          setActiveJob(null);
+          setBookedServices([]);
+          setVehicles([]);
+          setLoading(false);
+        }
+        return;
+      }
+
+      const [{ data: vData }, { data: jobData }, { data: apptData }] = await Promise.all([
+        supabase.from('vehicles').select('*').eq('customer_id', customer.id),
+        supabase
+          .from('work_orders')
+          .select('*, vehicles(plate), appointments(bay)')
+          .eq('customer_id', customer.id)
+          .neq('status', 'DELIVERED')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from('appointments')
+          .select('id, bay, start_time, duration_hours, title, type, work_orders(status, type, plate)')
+          .eq('customer_id', customer.id)
+          .order('start_time', { ascending: true }),
+      ]);
+
+      if (!active) return;
+
+      setVehicles(vData || []);
 
       if (jobData) {
         let jobBay = 'Garage';
         if (Array.isArray(jobData.appointments)) {
-           jobBay = jobData.appointments[0]?.bay || 'Garage';
+          jobBay = jobData.appointments[0]?.bay || 'Garage';
         } else if (jobData.appointments) {
-           jobBay = (jobData.appointments as any).bay || 'Garage';
+          jobBay = (jobData.appointments as any).bay || 'Garage';
         }
 
         setActiveJob({
@@ -79,14 +102,9 @@ export default function CustomerHomePage() {
           eta: 'Pending',
           amount: 'Estimating',
         });
+      } else {
+        setActiveJob(null);
       }
-
-      // Fetch all booked appointments for this customer (across dates)
-      const { data: apptData } = await supabase
-        .from('appointments')
-        .select('id, bay, start_time, duration_hours, title, type, work_orders(status, type, plate)')
-        .eq('customer_id', customer.id)
-        .order('start_time', { ascending: true });
 
       if (apptData) {
         setBookedServices(apptData.map((appointment: any) => {
@@ -104,10 +122,16 @@ export default function CustomerHomePage() {
       } else {
         setBookedServices([]);
       }
+
       setLoading(false);
     }
+
     loadDash();
-  }, [user]);
+
+    return () => {
+      active = false;
+    };
+  }, [authLoading, user?.email]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

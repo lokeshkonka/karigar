@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
+import { getCustomerByEmailCached } from '@/lib/customerClient';
 
 interface ExistingReview {
   id: string;
@@ -80,11 +81,7 @@ export default function ReviewPage() {
         return;
       }
 
-      const { data: customer } = await supabase
-        .from('customers')
-        .select('id, name')
-        .eq('email', user.email)
-        .maybeSingle();
+      const customer = await getCustomerByEmailCached(user.email);
 
       if (!customer) {
         setLoading(false);
@@ -155,7 +152,7 @@ export default function ReviewPage() {
     }
 
     loadReviewContext();
-  }, [user, authLoading]);
+  }, [authLoading, user?.email]);
 
   const selectedOrder = useMemo(
     () => workOrders.find((order) => order.id === selectedWorkOrderId) || null,

@@ -8,6 +8,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useAuthStore } from '@/store/useAuthStore';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
+import { getCustomerByEmailCached } from '@/lib/customerClient';
 
 interface Vehicle {
   id: string;
@@ -23,7 +24,7 @@ const MAKES = ['Hyundai', 'Maruti Suzuki', 'Tata', 'Mahindra', 'Honda', 'Toyota'
 const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'EV', 'Hybrid'];
 
 export default function MyVehiclesPage() {
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuthStore();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showQRForVehicle, setShowQRForVehicle] = useState<string | null>(null);
@@ -40,20 +41,28 @@ export default function MyVehiclesPage() {
 
   useEffect(() => {
     fetchVehicles();
-  }, []);
+  }, [authLoading, user?.email]);
 
   async function fetchVehicles() {
+    if (authLoading) return;
+
     setLoading(true);
-    if (!user?.email) { setLoading(false); return; }
+    if (!user?.email) {
+      setVehicles([]);
+      setLoading(false);
+      return;
+    }
     
-    const { data: cust } = await supabase.from('customers').select('id').eq('email', user.email).maybeSingle();
-    if (cust) {
-      const { data } = await supabase.from('vehicles').select('*').eq('customer_id', cust.id).order('created_at', { ascending: false });
+    const customer = await getCustomerByEmailCached(user.email);
+    if (customer) {
+      const { data } = await supabase.from('vehicles').select('*').eq('customer_id', customer.id).order('created_at', { ascending: false });
       if (data) {
         setVehicles(data.map(v => ({
           id: v.id, make: v.make, model: v.model, year: v.year?.toString() || '2020', plate: v.plate, fuel: v.fuel || 'Unknown', color: v.color || '#FFFFFF'
         })));
       }
+    } else {
+      setVehicles([]);
     }
     setLoading(false);
   }
@@ -66,12 +75,12 @@ export default function MyVehiclesPage() {
     
     if (!user?.email) return;
     
-    const { data: custData, error: custErr } = await supabase.from('customers').select('id, name').eq('email', user.email).maybeSingle();
-    if (!custData || custErr) { toast.error('Account not synced yet. Try logging in again.'); return; }
+    const customer = await getCustomerByEmailCached(user.email);
+    if (!customer) { toast.error('Account not synced yet. Try logging in again.'); return; }
     
     // Insert vehicle
     const { data, error } = await supabase.from('vehicles').insert([{
-      customer_id: custData.id,
+      customer_id: customer.id,
       make: form.make,
       model: form.model,
       year: parseInt(form.year, 10),
@@ -110,14 +119,18 @@ export default function MyVehiclesPage() {
     if (!selectedVehicle || !user?.email) return;
     setScheduling(true);
 
-    const { data: custData } = await supabase.from('customers').select('id, name').eq('email', user.email).maybeSingle();
-    if (!custData) return;
+    const customer = await getCustomerByEmailCached(user.email);
+    if (!customer) {
+      toast.error('Account not synced yet. Try logging in again.');
+      setScheduling(false);
+      return;
+    }
 
     // Create Work Order
     const { data: woData, error: woError } = await supabase.from('work_orders').insert({
       vehicle_id: selectedVehicle.id,
-      customer_id: custData.id,
-      customer_name: custData.name,
+      customer_id: customer.id,
+      customer_name: customer.name || user.name || 'Customer',
       plate: selectedVehicle.plate,
       type: 'General Service',
       status: 'WAITING',
@@ -137,7 +150,7 @@ export default function MyVehiclesPage() {
     // Create Appointment
     await supabase.from('appointments').insert({
       work_order_id: woData.id,
-      customer_id: custData.id,
+      customer_id: customer.id,
       bay: 'Unassigned',
       start_time: startObj.toISOString(),
       duration_hours: 2,
