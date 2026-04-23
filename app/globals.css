@@ -40,3 +40,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  aside,
+  .print-hidden {
+    display: none !important;
+  }
+
+  main {
+    margin-left: 0 !important;
+    overflow: visible !important;
+  }
+
+  #__admin-content {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
