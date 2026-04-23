@@ -13,13 +13,13 @@ export function Button({ className = '', variant = 'primary', children, ...props
       variantStyles = "bg-electricYellow text-[#1a1a1a] shadow-neo-sm";
       break;
     case 'secondary':
-      variantStyles = "bg-blue text-white shadow-neo-sm";
+      variantStyles = "bg-blue text-[#1a1a1a] shadow-neo-sm";
       break;
     case 'danger':
-      variantStyles = "bg-red text-white shadow-neo-sm";
+      variantStyles = "bg-red text-[#1a1a1a] shadow-neo-sm";
       break;
     case 'success':
-      variantStyles = "bg-green text-white shadow-neo-sm";
+      variantStyles = "bg-green text-[#1a1a1a] shadow-neo-sm";
       break;
     case 'outline':
       variantStyles = "bg-transparent text-[#1a1a1a] shadow-neo-sm hover:bg-cream";

@@ -128,7 +128,7 @@ export default function ReportsPage() {
             Revenue Velocity
           </h3>
           <div className="flex-1 min-h-0 w-full">
-            <ResponsiveContainer width="99%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorCurrent" x1="0" y1="0" x2="0" y2="1">
@@ -160,7 +160,7 @@ export default function ReportsPage() {
             Service Distribution
           </h3>
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">
-            <ResponsiveContainer width="99%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={serviceSplit}

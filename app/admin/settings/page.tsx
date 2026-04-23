@@ -47,7 +47,7 @@ export default function SettingsPage() {
           </Button>
           <Button 
             variant={activeTab === 'danger' ? 'primary' : 'outline'} 
-            className={`justify-start shrink-0 ${activeTab === 'danger' ? 'bg-red text-white border-red' : 'text-red border-red hover:bg-red/10'}`}
+            className={`justify-start shrink-0 ${activeTab === 'danger' ? 'bg-red text-[#1a1a1a] border-red' : 'text-red border-red hover:bg-red/10'}`}
             onClick={() => setActiveTab('danger')}
           >
             <AlertTriangle size={18} className="mr-2" /> Danger Zone
@@ -125,7 +125,7 @@ export default function SettingsPage() {
                   This action will permanently purge all Work Orders, Customers, and Invoices from the Supabase Postgres cluster. 
                   This cannot be undone.
                 </p>
-                <Button className="bg-red text-white border-red shadow-none hover:bg-red/90 uppercase tracking-widest font-black py-4">
+                <Button className="bg-red text-[#1a1a1a] border-red shadow-none hover:bg-red/90 uppercase tracking-widest font-black py-4">
                   Purge Database
                 </Button>
               </Card>

@@ -71,10 +71,10 @@ export default function SchedulePage() {
 
           const color =
             appointment.type === 'delivery'
-              ? 'bg-green text-white'
+              ? 'bg-green text-[#1a1a1a]'
               : appointment.type === 'diagnostic'
-                ? 'bg-orange text-white'
-                : 'bg-blue text-white';
+                ? 'bg-orange text-[#1a1a1a]'
+                : 'bg-blue text-[#1a1a1a]';
 
           return {
             ...appointment,
@@ -176,7 +176,7 @@ export default function SchedulePage() {
             {currentTimePosition >= 0 && currentTimePosition <= totalGridHeight && (
               <div className="absolute left-0 right-0 z-20 flex" style={{ top: `${currentTimePosition}px` }}>
                 <div className="w-[100px] text-right pr-2">
-                  <span className="bg-red text-white font-bold text-xs px-1 rounded-sm">
+                  <span className="bg-red text-[#1a1a1a] font-bold text-xs px-1 rounded-sm">
                     {currentTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                   </span>
                 </div>

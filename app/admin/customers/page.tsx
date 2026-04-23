@@ -124,7 +124,7 @@ export default function CustomersPage() {
                       <Badge className={
                         cust.tier === 'GOLD' ? 'bg-electricYellow text-[#1a1a1a]' : 
                         cust.tier === 'SILVER' ? 'bg-gray-300 text-[#1a1a1a]' : 
-                        'bg-orange text-white'
+                        'bg-orange text-[#1a1a1a]'
                       }>{cust.tier} MEMBER</Badge>
                     </div>
                   </td>
@@ -179,8 +179,8 @@ export default function CustomersPage() {
             <h3 className="font-black tracking-widest uppercase mb-2 border-b-2 border-[#1a1a1a] inline-block pb-1">Silver Members</h3>
             <p className="text-5xl font-black mt-2">{stats.silver}</p>
          </Card>
-         <Card className="bg-orange text-white border-white shadow-[4px_4px_0px_#ffffff]">
-            <h3 className="font-black tracking-widest uppercase mb-2 border-b-2 border-white inline-block pb-1">Bronze Members</h3>
+        <Card className="bg-orange text-[#1a1a1a] border-white shadow-[4px_4px_0px_#ffffff]">
+          <h3 className="font-black tracking-widest uppercase mb-2 border-b-2 border-[#1a1a1a] inline-block pb-1">Bronze Members</h3>
             <p className="text-5xl font-black mt-2">{stats.bronze}</p>
          </Card>
       </div>

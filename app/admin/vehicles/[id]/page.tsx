@@ -297,7 +297,7 @@ export default function VehicleDetailPage() {
               <div>
                 <p className="font-bold text-sm uppercase">AI Color Extracted via k-Means</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge className={`${v.color ? 'bg-green' : 'bg-orange'} text-white`}>
+                  <Badge className={`${v.color ? 'bg-green' : 'bg-orange'} text-[#1a1a1a]`}>
                     {v.color ? 'SCANNED' : 'AWAITING SCAN'}
                   </Badge>
                   <span className="text-xs font-bold text-gray-500">PBR Material · OrbitControls active</span>

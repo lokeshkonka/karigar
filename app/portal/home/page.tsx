@@ -148,7 +148,7 @@ export default function CustomerHomePage() {
                 <span className="bg-[#1a1a1a] text-electricYellow px-3 py-1 font-mono font-black tracking-widest text-base border-neo">
                   {activeJob.plate}
                 </span>
-                <Badge className="bg-[#1a1a1a] text-white border-0 shadow-none font-black uppercase tracking-widest px-3 py-1.5">{activeJob.status}</Badge>
+                <Badge className="bg-electricYellow text-[#1a1a1a] border-0 shadow-none font-black uppercase tracking-widest px-3 py-1.5">{activeJob.status}</Badge>
               </div>
 
               <div>
@@ -244,8 +244,8 @@ export default function CustomerHomePage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge className="bg-[#1a1a1a] text-white border-0 shadow-none">{service.status}</Badge>
-                      <Badge className={`${isPast ? 'bg-gray-300 text-[#1a1a1a]' : 'bg-blue text-white'} border-0 shadow-none`}>
+                      <Badge className="bg-electricYellow text-[#1a1a1a] border-0 shadow-none">{service.status}</Badge>
+                      <Badge className={`${isPast ? 'bg-gray-300 text-[#1a1a1a]' : 'bg-blue text-[#1a1a1a]'} border-0 shadow-none`}>
                         {isPast ? 'COMPLETED SLOT' : `BAY: ${service.bay}`}
                       </Badge>
                     </div>

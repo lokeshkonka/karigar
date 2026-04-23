@@ -316,8 +316,8 @@ function GarageStructure() {
 const STATUS_META: Record<string, { label: string; icon: any; bg: string; text: string; border: string }> = {
   empty:    { label: 'Empty',    icon: MapPin,        bg: 'bg-slate-100',    text: 'text-slate-500',  border: 'border-slate-300' },
   occupied: { label: 'In Service', icon: Wrench,      bg: 'bg-yellow-400',  text: 'text-[#1a1a1a]', border: 'border-[#1a1a1a]' },
-  overdue:  { label: 'Urgent',   icon: AlertTriangle, bg: 'bg-red-600',     text: 'text-white',      border: 'border-red-700' },
-  ready:    { label: 'Ready',    icon: CheckCircle2,  bg: 'bg-blue-500',    text: 'text-white',      border: 'border-blue-700' },
+  overdue:  { label: 'Urgent',   icon: AlertTriangle, bg: 'bg-red-600',     text: 'text-[#1a1a1a]', border: 'border-red-700' },
+  ready:    { label: 'Ready',    icon: CheckCircle2,  bg: 'bg-blue-500',    text: 'text-[#1a1a1a]', border: 'border-blue-700' },
 };
 
 export default function GarageMapPage() {
@@ -499,7 +499,7 @@ export default function GarageMapPage() {
             selectedBay.status === 'empty'    ? 'bg-slate-800' :
             selectedBay.status === 'overdue'  ? 'bg-red-600'   :
             selectedBay.status === 'ready'    ? 'bg-blue-600'  : 'bg-[#ffe500]';
-          const headerText = selectedBay.status === 'occupied' ? 'text-[#1a1a1a]' : selectedBay.status === 'empty' ? 'text-white' : 'text-white';
+          const headerText = selectedBay.status === 'empty' ? 'text-white' : 'text-[#1a1a1a]';
 
           return (
             <div className="absolute right-0 top-0 h-full w-80 bg-white/95 backdrop-blur-md border-l-4 border-[#1a1a1a] animate-in slide-in-from-right-6 duration-200 overflow-y-auto flex flex-col shadow-[-12px_0_30px_rgba(0,0,0,0.08)]">

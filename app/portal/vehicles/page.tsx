@@ -185,7 +185,7 @@ export default function MyVehiclesPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 pt-4 lg:pt-0 border-t-2 border-dashed border-gray-200 lg:border-t-0">
-              <Button onClick={() => { setSelectedVehicle(v); setShowBookModal(true); }} className="flex-1 lg:flex-none uppercase font-black bg-[#1a1a1a] text-white hover:bg-electricYellow hover:text-[#1a1a1a] tracking-widest px-6 py-6 border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a]">
+                <Button onClick={() => { setSelectedVehicle(v); setShowBookModal(true); }} className="flex-1 lg:flex-none uppercase font-black bg-electricYellow text-[#1a1a1a] hover:bg-cream hover:text-[#1a1a1a] tracking-widest px-6 py-6 border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a]">
                  <CalIcon size={20} className="mr-2" /> Book Service
               </Button>
               <Button
@@ -346,7 +346,7 @@ export default function MyVehiclesPage() {
               </div>
             </div>
 
-            <Button onClick={handleBookService} disabled={scheduling} className="w-full mt-6 py-6 text-lg font-black uppercase tracking-widest bg-blue border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] text-white">
+            <Button onClick={handleBookService} disabled={scheduling} className="w-full mt-6 py-6 text-lg font-black uppercase tracking-widest bg-blue border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] text-[#1a1a1a]">
               {scheduling ? 'Booking...' : 'Confirm Appointment'}
             </Button>
           </Card>
@@ -371,7 +371,7 @@ export default function MyVehiclesPage() {
             <p className="text-xs font-bold text-gray-600 text-center uppercase tracking-wide">
               Show this QR code to the workshop technician for quick 3D check-in
             </p>
-            <Button onClick={() => setShowQRForVehicle(null)} className="w-full mt-2 py-6 font-black tracking-widest uppercase border-[#1a1a1a] bg-[#1a1a1a] text-white">
+            <Button onClick={() => setShowQRForVehicle(null)} className="w-full mt-2 py-6 font-black tracking-widest uppercase border-[#1a1a1a] bg-electricYellow text-[#1a1a1a]">
               Close Pass
             </Button>
           </div>

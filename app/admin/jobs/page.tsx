@@ -227,8 +227,8 @@ export default function KanbanPage() {
                                     <span className="bg-[#1a1a1a] text-white px-2 py-1 text-xs font-black tracking-wider">
                                       {task.id.split('-')[0]}...
                                     </span>
-                                    {task.priority === 'urgent' && <Badge className="bg-orange text-white">URGENT</Badge>}
-                                    {task.priority === 'critical' && <Badge className="bg-red text-white">CRITICAL</Badge>}
+                                    {task.priority === 'urgent' && <Badge className="bg-orange text-[#1a1a1a]">URGENT</Badge>}
+                                    {task.priority === 'critical' && <Badge className="bg-red text-[#1a1a1a]">CRITICAL</Badge>}
                                   </div>
                                   
                                   <div className="bg-electricYellow px-3 py-1.5 inline-block font-mono text-lg font-black tracking-widest border-neo-sm mb-3">
@@ -236,7 +236,7 @@ export default function KanbanPage() {
                                   </div>
                                   
                                   <p className="font-bold text-sm mb-1 line-clamp-1">{task.customer}</p>
-                                  <Badge className="bg-blue text-white mb-3 block w-fit">{task.type}</Badge>
+                                  <Badge className="bg-blue text-[#1a1a1a] mb-3 block w-fit">{task.type}</Badge>
 
                                   <div className="mb-4">
                                     <select 

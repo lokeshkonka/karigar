@@ -73,10 +73,10 @@ export default function PartsTicketsPage() {
                  {t.work_orders?.[0]?.plate || t.work_orders?.plate || 'Unknown WO'}
               </span>
               <Badge className={
-                t.status === 'pending' ? 'bg-orange text-white' :
-                t.status === 'approved' ? 'bg-blue text-white' :
-                t.status === 'sourced' ? 'bg-green text-white' :
-                'bg-red text-white'
+                t.status === 'pending' ? 'bg-orange text-[#1a1a1a]' :
+                t.status === 'approved' ? 'bg-blue text-[#1a1a1a]' :
+                t.status === 'sourced' ? 'bg-green text-[#1a1a1a]' :
+                'bg-red text-[#1a1a1a]'
               }>{t.status.toUpperCase()}</Badge>
             </div>
             
@@ -90,10 +90,10 @@ export default function PartsTicketsPage() {
 
             {t.status === 'pending' && (
               <div className="grid grid-cols-2 gap-3 mt-auto">
-                <Button onClick={() => updateStatus(t.id, 'approved')} className="bg-blue hover:bg-blue-600 border-none text-white flex gap-2">
+                <Button onClick={() => updateStatus(t.id, 'approved')} className="bg-blue hover:bg-blue-600 border-none text-[#1a1a1a] flex gap-2">
                   <CheckCircle size={16} /> Approve
                 </Button>
-                <Button onClick={() => updateStatus(t.id, 'rejected')} className="bg-red hover:bg-red-600 border-none text-white flex gap-2">
+                <Button onClick={() => updateStatus(t.id, 'rejected')} className="bg-red hover:bg-red-600 border-none text-[#1a1a1a] flex gap-2">
                   <XCircle size={16} /> Reject
                 </Button>
               </div>
@@ -101,7 +101,7 @@ export default function PartsTicketsPage() {
             
             {t.status === 'approved' && (
               <div className="mt-auto">
-                <Button onClick={() => updateStatus(t.id, 'sourced')} className="w-full bg-green hover:bg-green-600 border-none text-white flex justify-center gap-2">
+                <Button onClick={() => updateStatus(t.id, 'sourced')} className="w-full bg-green hover:bg-green-600 border-none text-[#1a1a1a] flex justify-center gap-2">
                   <CheckCircle size={16} /> Mark Sourced
                 </Button>
               </div>

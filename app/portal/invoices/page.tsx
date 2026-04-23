@@ -151,7 +151,7 @@ export default function InvoicesPage() {
                     <p className="font-black text-lg uppercase leading-tight">{inv.service}</p>
                     <p className="text-xs font-bold text-gray-500">{inv.plate} · {inv.date}</p>
                   </div>
-                  <Badge className="bg-red text-white border-0 shadow-none">UNPAID</Badge>
+                  <Badge className="bg-red text-[#1a1a1a] border-0 shadow-none">UNPAID</Badge>
                 </div>
                 <div className="flex justify-between items-center pt-3 border-t-2 border-dashed border-gray-200">
                   <span className="font-black text-2xl">₹ {inv.amount.toLocaleString('en-IN')}</span>
@@ -184,7 +184,7 @@ export default function InvoicesPage() {
                     <p className="text-xs font-bold text-gray-400">{inv.plate} · {inv.date}</p>
                   </div>
                   <div className="text-right">
-                    <Badge className="bg-green text-white border-0 shadow-none mb-1">PAID</Badge>
+                    <Badge className="bg-green text-[#1a1a1a] border-0 shadow-none mb-1">PAID</Badge>
                     <p className="font-black text-lg">₹ {inv.amount.toLocaleString('en-IN')}</p>
                   </div>
                 </div>

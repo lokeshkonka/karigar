@@ -204,9 +204,9 @@ export default function InventoryPage() {
                 <span className="bg-[#1a1a1a] text-white font-mono text-xs px-2 py-1 tracking-widest font-black">
                   {item.sku}
                 </span>
-                {item.status === 'out' && <Badge className="bg-red text-white uppercase text-[10px] animate-pulse">Out of Stock</Badge>}
-                {item.status === 'low' && <Badge className="bg-orange text-white uppercase text-[10px]">Low Stock</Badge>}
-                {item.status === 'good' && <Badge className="bg-green text-white uppercase text-[10px]">In Stock</Badge>}
+                {item.status === 'out' && <Badge className="bg-red text-[#1a1a1a] uppercase text-[10px] animate-pulse">Out of Stock</Badge>}
+                {item.status === 'low' && <Badge className="bg-orange text-[#1a1a1a] uppercase text-[10px]">Low Stock</Badge>}
+                {item.status === 'good' && <Badge className="bg-green text-[#1a1a1a] uppercase text-[10px]">In Stock</Badge>}
               </div>
               
               <h3 className="font-black uppercase text-xl mb-4 leading-tight">{item.name}</h3>
@@ -281,7 +281,7 @@ export default function InventoryPage() {
         Top Stock Value By Part
       </h2>
       <Card className="h-[350px]">
-        <ResponsiveContainer width="99%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <BarChart data={inventory.map(i => ({ name: i.name.split(' ')[0], value: i.cost * i.stock })).sort((a,b) => b.value - a.value).slice(0,6)} margin={{ top: 20, right: 30, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
             <XAxis dataKey="name" axisLine={{ stroke: '#1a1a1a', strokeWidth: 3 }} tickLine={false} tick={{ fontWeight: 900, fill: '#1a1a1a' }} />

@@ -128,7 +128,7 @@ export default function StaffCustomersPage() {
                     <span className={`text-xs font-black px-2 py-1 border-2 uppercase ${
                       c.tier === 'GOLD' ? 'border-[#1a1a1a] bg-electricYellow text-[#1a1a1a]' :
                       c.tier === 'SILVER' ? 'border-gray-400 bg-gray-200 text-gray-600' :
-                      'border-orange-700 bg-orange text-white'
+                      'border-orange-700 bg-orange text-[#1a1a1a]'
                     }`}>{c.tier || 'BRONZE'}</span>
                     <div className="text-gray-500">
                       {isExpanded ? <ChevronDown size={24} /> : <ChevronRight size={24} />}

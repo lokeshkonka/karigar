@@ -173,7 +173,7 @@ export default function StaffPage() {
                       <button
                         onClick={() => handleToggleStatus(s.id, s.status)}
                         className={`px-2 py-1 text-xs font-black uppercase border-2 cursor-pointer transition-colors ${s.status === 'active'
-                          ? 'bg-green text-white border-green hover:bg-green/80'
+                          ? 'bg-green text-[#1a1a1a] border-green hover:bg-green/80'
                           : 'bg-gray-200 text-gray-600 border-gray-400 hover:bg-gray-300'
                         }`}
                       >

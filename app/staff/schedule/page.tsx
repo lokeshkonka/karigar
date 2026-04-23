@@ -107,10 +107,10 @@ export default function StaffSchedulePage() {
 
         const color =
           appointment.type === 'delivery'
-            ? 'bg-green text-white'
+            ? 'bg-green text-[#1a1a1a]'
             : appointment.type === 'diagnostic'
-              ? 'bg-orange text-white'
-              : 'bg-blue text-white';
+              ? 'bg-orange text-[#1a1a1a]'
+              : 'bg-blue text-[#1a1a1a]';
 
         return {
           ...appointment,

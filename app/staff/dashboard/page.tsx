@@ -319,8 +319,8 @@ export default function StaffDashboardPage() {
               <div>
                 <div className="flex gap-2 items-center mb-1">
                   <div className="font-mono text-[#1a1a1a] font-black tracking-widest bg-electricYellow px-2 py-1 inline-block border-neo-sm text-sm">{v?.plate || 'UNKNOWN'}</div>
-                  <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 ${job.priority === 'urgent' ? 'bg-red text-white' : 'bg-gray-200 text-gray-600'}`}>{job.priority}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 bg-blue text-white">{job.status}</span>
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 ${job.priority === 'urgent' ? 'bg-red text-[#1a1a1a]' : 'bg-gray-200 text-gray-600'}`}>{job.priority}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 bg-blue text-[#1a1a1a]">{job.status}</span>
                 </div>
                 <h4 className="text-[#1a1a1a] font-black uppercase text-xl leading-none">{job.type}</h4>
                 <p className="text-sm font-bold text-gray-500 uppercase mt-1 line-clamp-1">{job.issue_description}</p>
@@ -339,7 +339,7 @@ export default function StaffDashboardPage() {
                   </select>
                 </div>
               </div>
-              <Button onClick={() => handleStartJob(job.id)} disabled={!!activeJob || !canStart} className="shrink-0 bg-[#1a1a1a] text-white hover:bg-electricYellow hover:text-[#1a1a1a] border-2 border-[#1a1a1a] font-black uppercase tracking-wider py-6 px-8">
+              <Button onClick={() => handleStartJob(job.id)} disabled={!!activeJob || !canStart} className="shrink-0 bg-electricYellow text-[#1a1a1a] hover:bg-cream hover:text-[#1a1a1a] border-2 border-[#1a1a1a] font-black uppercase tracking-wider py-6 px-8">
                 <Play size={18} className="mr-2" /> Start Repair
               </Button>
             </Card>

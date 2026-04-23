@@ -12,16 +12,16 @@ export function Badge({ className = '', variant = 'default', children, ...props 
       variantStyles = "bg-electricYellow text-[#1a1a1a]";
       break;
     case 'inprogress':
-      variantStyles = "bg-blue text-white";
+      variantStyles = "bg-blue text-[#1a1a1a]";
       break;
     case 'quality':
-      variantStyles = "bg-orange text-white";
+      variantStyles = "bg-orange text-[#1a1a1a]";
       break;
     case 'ready':
-      variantStyles = "bg-green text-white";
+      variantStyles = "bg-green text-[#1a1a1a]";
       break;
     case 'overdue':
-      variantStyles = "bg-red text-white animate-pulse shadow-[0_0_10px_rgba(226,75,74,0.7)]";
+      variantStyles = "bg-red text-[#1a1a1a] animate-pulse shadow-[0_0_10px_rgba(226,75,74,0.7)]";
       break;
   }
 

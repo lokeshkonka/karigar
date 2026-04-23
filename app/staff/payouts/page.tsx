@@ -147,7 +147,7 @@ export default function StaffPayoutsPage() {
           <p className="text-5xl font-mono font-black text-green-700">₹{stats.thisMonth}</p>
         </Card>
 
-        <Card className="bg-[#1a1a1a] border-4 border-gray-800 shadow-[6px_6px_0_#000] p-6 text-white">
+        <Card className="bg-cream border-4 border-[#1a1a1a] shadow-[6px_6px_0_#1a1a1a] p-6 text-[#1a1a1a]">
           <span className="font-black uppercase tracking-widest text-sm text-gray-400 block mb-2">Pending Release</span>
           <p className="text-5xl font-mono font-black text-orange">₹{stats.pending}</p>
         </Card>
@@ -161,7 +161,7 @@ export default function StaffPayoutsPage() {
               You have approximately <span className="text-green-600 font-mono font-black">₹{unclaimedRevenue.toFixed(2)}</span> in recent verified invoices that have not been added to a payout cycle yet.
             </p>
           </div>
-          <Button onClick={handleCreateReceipt} className="bg-blue hover:bg-blue-600 text-white font-black uppercase tracking-widest border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] transition-all hover:translate-x-[2px] hover:translate-y-[2px] py-6 px-6 flex items-center gap-3 shrink-0">
+          <Button onClick={handleCreateReceipt} className="bg-blue hover:bg-blue-600 text-[#1a1a1a] font-black uppercase tracking-widest border-2 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] transition-all hover:translate-x-[2px] hover:translate-y-[2px] py-6 px-6 flex items-center gap-3 shrink-0">
             <FilePlus size={24} />
             Request Payout
           </Button>
@@ -176,7 +176,7 @@ export default function StaffPayoutsPage() {
         ) : payouts.map(p => (
           <Card key={p.id} className="bg-white border-4 border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] flex justify-between items-center p-6 mx-2 hover:translate-x-1 transition-transform">
             <div className="flex gap-4 items-center">
-              <div className={`p-3 border-2 border-[#1a1a1a] ${p.status === 'paid' ? 'bg-green text-white' : 'bg-orange text-white'}`}>
+              <div className={`p-3 border-2 border-[#1a1a1a] ${p.status === 'paid' ? 'bg-green text-[#1a1a1a]' : 'bg-orange text-[#1a1a1a]'}`}>
                 {p.status === 'paid' ? <CheckCircle size={24} /> : <Clock size={24} />}
               </div>
               <div>
@@ -185,7 +185,7 @@ export default function StaffPayoutsPage() {
               </div>
             </div>
             
-            <Badge className={`${p.status === 'paid' ? 'bg-green text-white' : 'bg-orange text-white'} uppercase font-black px-3 py-1`}>
+            <Badge className={`${p.status === 'paid' ? 'bg-green text-[#1a1a1a]' : 'bg-orange text-[#1a1a1a]'} uppercase font-black px-3 py-1`}>
               {p.status}
             </Badge>
           </Card>

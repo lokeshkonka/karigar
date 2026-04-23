@@ -261,9 +261,9 @@ export default function AdminPayoutsPage() {
                       <td className="py-3 px-4 font-black font-mono text-green-600">₹{p.amount}</td>
                       <td className="py-3 px-4 text-center">
                         {p.status === 'pending' ? (
-                           <Button onClick={() => handleApprovePayout(p.id)} className="bg-electricYellow hover:bg-[#1a1a1a] hover:text-white text-[#1a1a1a] font-black uppercase text-xs tracking-widest py-1 h-auto border-2 border-[#1a1a1a] shadow-[2px_2px_0_#1a1a1a]">Verify & Pay</Button>
+                          <Button onClick={() => handleApprovePayout(p.id)} className="bg-electricYellow hover:bg-cream hover:text-[#1a1a1a] text-[#1a1a1a] font-black uppercase text-xs tracking-widest py-1 h-auto border-2 border-[#1a1a1a] shadow-[2px_2px_0_#1a1a1a]">Verify & Pay</Button>
                         ) : (
-                           <Badge className="bg-green text-white border-0 shadow-none font-black px-3 py-1">PAID</Badge>
+                          <Badge className="bg-green text-[#1a1a1a] border-0 shadow-none font-black px-3 py-1">PAID</Badge>
                         )}
                       </td>
                     </tr>
