@@ -8,7 +8,7 @@ import { extractDominantColor, estimateCarDimensions } from '@/lib/colorExtracto
 import dynamic from 'next/dynamic';
 const VehicleModelViewer = dynamic(
   () => import('@/components/3d/VehicleModelViewer').then(m => m.VehicleModelViewer),
-  { ssr: false, loading: () => <div className="h-64 flex items-center justify-center bg-[#1a1a1a]/20 rounded font-bold text-sm">Rendering 3D preview...</div> }
+  { ssr: false, loading: () => <div className="h-64 flex items-center justify-center bg-foreground/20 rounded font-bold text-sm">Rendering 3D preview...</div> }
 );
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -51,6 +51,15 @@ export default function ScanIntakePage() {
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.playsInline = true;
+        await new Promise<void>((resolve) => {
+          if (videoRef.current && videoRef.current.readyState >= 1) {
+            resolve();
+            return;
+          }
+
+          videoRef.current!.onloadedmetadata = () => resolve();
+        });
         await videoRef.current.play();
       }
       return true;
@@ -188,12 +197,12 @@ export default function ScanIntakePage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       {/* Header */}
-      <header className="bg-electricYellow text-[#1a1a1a] px-4 py-3 flex justify-between items-center shrink-0 border-b-4 border-[#1a1a1a]">
+      <header className="bg-electricYellow text-foreground px-4 py-3 flex justify-between items-center shrink-0 border-b-4 border-foreground">
         <div>
           <h1 className="font-black uppercase tracking-widest text-lg leading-none">Vehicle Scanner</h1>
-          <p className="font-bold text-[10px] text-[#1a1a1a]/60 uppercase">AI Color Extraction · 3D Build</p>
+          <p className="font-bold text-[10px] text-foreground/60 uppercase">AI Color Extraction · 3D Build</p>
         </div>
-        <div className="bg-[#1a1a1a] text-electricYellow font-mono text-xs px-3 py-1.5 font-black border-2 border-[#1a1a1a]">
+        <div className="bg-foreground text-electricYellow font-mono text-xs px-3 py-1.5 font-black border-2 border-foreground">
           ID: {String(vehicleId).slice(0, 8)}...
         </div>
       </header>
@@ -207,7 +216,7 @@ export default function ScanIntakePage() {
         {/* ── INTRO ── */}
         {step === 'intro' && (
           <div className="flex flex-col items-center justify-center h-full min-h-[80vh] p-6 space-y-8 text-center animate-in fade-in">
-            <div className="w-28 h-28 bg-electricYellow text-[#1a1a1a] border-4 border-[#1a1a1a] flex items-center justify-center rotate-3">
+            <div className="w-28 h-28 bg-electricYellow text-foreground border-4 border-foreground flex items-center justify-center rotate-3">
               <Camera size={56} strokeWidth={2} />
             </div>
 
@@ -225,7 +234,7 @@ export default function ScanIntakePage() {
                 { n: '02', label: 'Side Profile', desc: 'Stand 2-3m from the side panel' },
                 { n: '03', label: '3D Result', desc: 'Color-accurate model generated' },
               ].map(item => (
-                <div key={item.n} className="bg-[#1a1a1a] border border-gray-800 p-4 flex-1">
+                <div key={item.n} className="bg-foreground border border-gray-800 p-4 flex-1">
                   <p className="text-electricYellow font-black text-2xl">{item.n}</p>
                   <p className="font-black uppercase text-sm mt-1">{item.label}</p>
                   <p className="text-gray-500 text-xs font-bold mt-1">{item.desc}</p>
@@ -240,7 +249,7 @@ export default function ScanIntakePage() {
                   setStep('top');
                 }
               }}
-              className="w-full max-w-sm py-5 bg-electricYellow text-[#1a1a1a] border-4 border-[#1a1a1a] shadow-[4px_4px_0px_#FFE500] font-black uppercase text-xl tracking-wider hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+              className="w-full max-w-sm py-5 bg-electricYellow text-foreground border-4 border-foreground shadow-[4px_4px_0px_#FFE500] font-black uppercase text-xl tracking-wider hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
             >
               <Camera size={24} className="inline mr-3 -mt-1" /> Begin Scan
             </button>
@@ -251,12 +260,19 @@ export default function ScanIntakePage() {
         {(step === 'top' || step === 'side') && (
           <div className="absolute inset-0 flex flex-col">
             {/* Video */}
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-h-[56vh] bg-black overflow-hidden">
               <video
                 ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-contain bg-black"
                 playsInline muted autoPlay
               />
+
+                <button
+                  type="button"
+                  onClick={() => capture(step === 'top' ? 'top' : 'side')}
+                  className="absolute inset-0 z-10 touch-manipulation"
+                  aria-label={step === 'top' ? 'Capture top view' : 'Capture side view'}
+                />
 
               {/* AR Overlay */}
               <div className="absolute inset-0 pointer-events-none">
@@ -273,7 +289,7 @@ export default function ScanIntakePage() {
                 {/* Center guidance */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-dashed border-electricYellow/50 w-3/4 h-1/2" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-8">
-                  <div className="bg-electricYellow text-[#1a1a1a] font-black uppercase text-sm px-4 py-2 tracking-widest">
+                  <div className="bg-electricYellow text-foreground font-black uppercase text-sm px-4 py-2 tracking-widest">
                     {step === 'top' ? '▲ TOP VIEW — Hold above roof' : '◀ SIDE VIEW — Level with door panel'}
                   </div>
                 </div>
@@ -307,7 +323,7 @@ export default function ScanIntakePage() {
 
               <button
                 onClick={() => capture(step === 'top' ? 'top' : 'side')}
-                className="w-full py-5 bg-electricYellow text-[#1a1a1a] font-black uppercase text-2xl tracking-wider flex items-center justify-center gap-3 border-4 border-[#1a1a1a] active:scale-95 transition-transform"
+                className="w-full py-5 bg-electricYellow text-foreground font-black uppercase text-2xl tracking-wider flex items-center justify-center gap-3 border-4 border-foreground active:scale-95 transition-transform touch-manipulation"
               >
                 <Camera size={28} strokeWidth={2.5} />
                 CAPTURE {step === 'top' ? 'TOP' : 'SIDE'} VIEW
@@ -384,7 +400,7 @@ export default function ScanIntakePage() {
             </div>
 
             {/* Result Panel */}
-            <div className="bg-[#1a1a1a] border-t-4 border-electricYellow p-5 space-y-4 shrink-0">
+            <div className="bg-foreground border-t-4 border-electricYellow p-5 space-y-4 shrink-0">
               <div className="flex items-center gap-4">
                 <div
                   className="w-14 h-14 border-4 border-white shrink-0"
@@ -407,7 +423,7 @@ export default function ScanIntakePage() {
                 <button
                   onClick={handleSaveToVehicle}
                   disabled={saving}
-                  className="flex-1 py-3 bg-electricYellow text-[#1a1a1a] border-2 border-electricYellow font-black uppercase text-sm flex items-center justify-center gap-2 hover:brightness-90 disabled:opacity-60"
+                  className="flex-1 py-3 bg-electricYellow text-foreground border-2 border-electricYellow font-black uppercase text-sm flex items-center justify-center gap-2 hover:brightness-90 disabled:opacity-60"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                   {saving ? 'Saving...' : 'Save to Vehicle'}
